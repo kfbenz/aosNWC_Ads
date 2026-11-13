@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <section class="panel">
+    <h2>{{ 'Create Ad' if form_mode == 'create' else 'Edit Ad' }}</h2>
+
+    <form method="post" class="ad-form">
+      <label>
+        Title
+        <input name="title" required value="{{ ad.title if ad else '' }}">
+      </label>
+
+      <label>
+        Customer
+        <input name="customer" required value="{{ ad.customer if ad else '' }}">
+      </label>
+
+      <label>
+        Ad Type
+        <input name="ad_type" required value="{{ ad.ad_type if ad else '' }}">
+      </label>
+
+      <label>
+        Run Date
+        <input type="date" name="run_date" value="{{ ad.run_date if ad and ad.run_date else '' }}">
+      </label>
+
+      <label>
+        Notes
+        <textarea name="notes" rows="5">{{ ad.notes if ad and ad.notes else '' }}</textarea>
+      </label>
+
+      <div class="form-actions">
+        <button type="submit">Save</button>
+        <a href="{{ url_for('main.index') }}">Cancel</a>
+      </div>
+    </form>
+  </section>
+{% endblock %}

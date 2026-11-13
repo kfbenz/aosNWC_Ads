@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <section class="panel">
+    <h2>Ads</h2>
+
+    {% if ads %}
+      <table>
+        <thead>
+          <tr>
+            <th>Run Date</th>
+            <th>Title</th>
+            <th>Customer</th>
+            <th>Type</th>
+            <th>Notes</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ad in ads %}
+            <tr>
+              <td>{{ ad.run_date or '' }}</td>
+              <td>{{ ad.title }}</td>
+              <td>{{ ad.customer }}</td>
+              <td>{{ ad.ad_type }}</td>
+              <td>{{ ad.notes or '' }}</td>
+              <td class="actions">
+                <a href="{{ url_for('main.edit_ad', ad_id=ad.id) }}">Edit</a>
+                <form method="post" action="{{ url_for('main.delete_ad', ad_id=ad.id) }}" onsubmit="return confirm('Delete this ad?');">
+                  <button type="submit">Delete</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No ads yet. Add your first entry.</p>
+    {% endif %}
+  </section>
+{% endblock %}

@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.db
+.env
+.venv/
+venv/
+instance/
+migrations/__pycache__/
+
+*.accdb
+*.laccdb
+exports/

@@ -1,0 +1,168 @@
+:root {
+  --bg: #f4f1ec;
+  --text: #222222;
+  --surface: #ffffff;
+  --border: #d7cfc3;
+  --accent: #7c261e;
+  --accent-hover: #5e1d17;
+  --success: #1f6b43;
+  --error: #9a2c2c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at top right, #ece6dd, var(--bg) 45%);
+  color: var(--text);
+  font-family: "Georgia", "Times New Roman", serif;
+}
+
+.site-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  background: #fff8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.site-header h1 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.site-header a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.content {
+  max-width: 1100px;
+  margin: 1.5rem auto;
+  padding: 0 1rem;
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 0.6rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.actions form {
+  margin: 0;
+}
+
+.button,
+button {
+  display: inline-block;
+  background: var(--accent);
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.45rem 0.75rem;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+button:hover,
+.button:hover {
+  background: var(--accent-hover);
+}
+
+.ad-form {
+  display: grid;
+  gap: 0.8rem;
+}
+
+label {
+  display: grid;
+  gap: 0.35rem;
+  font-weight: 600;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 0.55rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  font: inherit;
+}
+
+.form-actions {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+}
+
+.flash-list {
+  list-style: none;
+  padding: 0;
+}
+
+.flash {
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+  margin-bottom: 0.65rem;
+}
+
+.flash-success {
+  background: #e7f7ef;
+  color: var(--success);
+}
+
+.flash-error {
+  background: #fbecec;
+  color: var(--error);
+}
+
+@media (max-width: 800px) {
+  table,
+  thead,
+  tbody,
+  th,
+  td,
+  tr {
+    display: block;
+  }
+
+  thead {
+    display: none;
+  }
+
+  tr {
+    margin-bottom: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.5rem;
+    background: #fff;
+  }
+
+  td {
+    border: none;
+    padding: 0.35rem 0;
+  }
+}

@@ -1,0 +1,16 @@
+[Unit]
+Description=AOS NWC Ads Flask application
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/aosnwcads
+EnvironmentFile=/opt/aosnwcads/.env
+ExecStart=/opt/aosnwcads/.venv/bin/gunicorn --bind 127.0.0.1:8000 --workers 3 wsgi:app
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

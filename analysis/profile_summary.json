@@ -1,0 +1,22 @@
+﻿{
+    "DatabasePath":  "./NWC_ADV_DB_2015.accdb",
+    "GeneratedAtUtc":  "2026-08-20T13:59:45.6389913Z",
+    "TableCount":  8,
+    "Tables":  [
+                   "Copy of tbl_ProgressContacts_01",
+                   "Paste Errors",
+                   "tbl_CrosstabByRunDate_01",
+                   "tbl_ProgressAds_01",
+                   "tbl_ProgressContacts_01",
+                   "tbl_ProgressContactsWAds_XDateRun_02",
+                   "tbl_ProgressSearches_01",
+                   "tbl_ProgressSearchResults_01"
+               ],
+    "Quality":  {
+                    "TotalAds":  11868,
+                    "AdsWithNullAccount":  7,
+                    "AdsWithNullDateRun":  488,
+                    "AdsWithNullDateSold":  4901,
+                    "OrphanAds":  432
+                }
+}

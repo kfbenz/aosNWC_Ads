@@ -23,6 +23,7 @@ from app.auth import require_role
 from app.extensions import db
 from app.forms import AdForm
 from app.locking import row_version as _version
+from app.lookups import FORM_FIELD_KIND, dropdown_choices
 from app.target_models import Account, AdPlacement
 
 
@@ -140,7 +141,8 @@ def new_ad(account_number: str):
             form.authorized_by.data = last.authorized_by
         form.date_sold.data = date.today()
 
-    if form.validate_on_submit():
+    choices = _lookup_choices(None)
+    if form.validate_on_submit() and _lookup_values_ok(form, choices):
         ad = AdPlacement(account_number=account.account_number, legacy_account_number=account.account_number)
         _apply_ad_form(form, ad)
         db.session.add(ad)
@@ -148,7 +150,8 @@ def new_ad(account_number: str):
         flash("Ad added.", "success")
         return redirect(url_for("accounts.detail", account_number=account.account_number))
 
-    return render_template("ads/form.html", form=form, ad=None, account=account, suggestions=_suggestions())
+    return render_template("ads/form.html", form=form, ad=None, account=account, suggestions=_suggestions(),
+                           choices=choices)
 
 
 @main_bp.route("/ads/<int:ad_id>/edit", methods=["GET", "POST"])
@@ -161,7 +164,8 @@ def edit_ad(ad_id: int):
         form.commission_pct.data = _fraction_to_pct(ad.commission_percent)
         form.version.data = _version(ad)
 
-    if form.validate_on_submit():
+    choices = _lookup_choices(ad)
+    if form.validate_on_submit() and _lookup_values_ok(form, choices):
         if form.version.data != _version(ad):
             flash(
                 "Someone else saved this ad while you were editing it. "
@@ -177,7 +181,8 @@ def edit_ad(ad_id: int):
             return redirect(url_for("accounts.detail", account_number=ad.account_number))
         return redirect(url_for("main.ad_detail", ad_id=ad.id))
 
-    return render_template("ads/form.html", form=form, ad=ad, account=ad.account, suggestions=_suggestions())
+    return render_template("ads/form.html", form=form, ad=ad, account=ad.account, suggestions=_suggestions(),
+                           choices=choices)
 
 
 @main_bp.post("/ads/<int:ad_id>/delete")
@@ -191,6 +196,22 @@ def delete_ad(ad_id: int):
     if account_number:
         return redirect(url_for("accounts.detail", account_number=account_number))
     return redirect(url_for("main.index"))
+
+
+def _lookup_choices(ad: AdPlacement | None) -> dict:
+    """Dropdown options per ad-form field, or None where the lookup list is still empty."""
+    return {field: dropdown_choices(kind, getattr(ad, field) if ad else None) for field, kind in FORM_FIELD_KIND.items()}
+
+
+def _lookup_values_ok(form: AdForm, choices: dict) -> bool:
+    """Reject values that are not on the list (an ad's own legacy value is allowed to stay)."""
+    ok = True
+    for field, options in choices.items():
+        value = getattr(form, field).data
+        if options is not None and value is not None and value not in {v for v, _ in options}:
+            getattr(form, field).errors.append("Choose a value from the list.")
+            ok = False
+    return ok
 
 
 def _fraction_to_pct(value):

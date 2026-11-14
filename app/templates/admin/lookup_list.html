@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title %}{{ spec.title }}{% endblock %}
+
+{% block content %}
+  <div class="record-nav">
+    <a href="{{ url_for('admin.lookups') }}">&laquo; All lookup lists</a>
+    <span class="spacer"></span>
+    <a href="{{ url_for('admin.normalization', domain=kind) }}">Merge {{ spec.field_label|lower }} spellings &rsaquo;</a>
+  </div>
+
+  <section class="panel">
+    <h2>{{ spec.title }} <small>allowed values for the ad form's {{ spec.field_label }} field</small></h2>
+
+    <form method="post" action="{{ url_for('admin.lookup_add', kind=kind) }}" class="inline-form add-entry">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label>Value <input name="code" maxlength="{{ code_max }}" required placeholder="As stored on ads"></label>
+      <label>{{ spec.label_title }} <input name="label" maxlength="100" placeholder="Optional"></label>
+      <button type="submit">Add</button>
+    </form>
+
+    {% if entries %}
+      <table class="compact">
+        <thead><tr><th>Value</th><th>{{ spec.label_title }}</th><th class="num">Ads</th><th>Active</th><th></th></tr></thead>
+        <tbody>
+          {% for e in entries %}
+            <tr class="{{ '' if e.is_active else 'inactive-row' }}">
+              <td><code>{{ e.code }}</code></td>
+              <td colspan="3">
+                <form method="post" action="{{ url_for('admin.lookup_update', kind=kind, entry_id=e.id) }}" class="inline-form row-form">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <input name="label" value="{{ label_of(e) or '' }}" maxlength="100" aria-label="{{ spec.label_title }} for {{ e.code }}">
+                  <span class="num ads-count">{{ '{:,}'.format(counts.get(e.code, 0)) }}</span>
+                  <label class="check"><input type="checkbox" name="is_active" value="1" {{ 'checked' if e.is_active }}> Active</label>
+                  <button type="submit" class="button-secondary">Save</button>
+                </form>
+              </td>
+              <td>
+                {% if not counts.get(e.code) %}
+                  <form method="post" action="{{ url_for('admin.lookup_delete', kind=kind, entry_id=e.id) }}"
+                        onsubmit="return confirm('Remove {{ e.code }} from the list?');">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="button-danger">Remove</button>
+                  </form>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="callout">This list is empty, so the {{ spec.field_label }} field on the ad form is still free text.
+        Add values above, or pick from the values already used on ads below.</p>
+    {% endif %}
+  </section>
+
+  <section class="panel">
+    <h2>Values used on ads but not on this list <small>{{ '{:,}'.format(off_total) }} value{{ 's' if off_total != 1 }}</small></h2>
+
+    <form method="get" class="filters filters-search">
+      <label>Find <input name="q" value="{{ q }}" placeholder="Part of a value"></label>
+      <div class="filter-actions"><button type="submit">Find</button><a href="{{ url_for('admin.lookup_list', kind=kind) }}">Clear</a></div>
+    </form>
+
+    {% if off_list %}
+      <form method="post" action="{{ url_for('admin.lookup_add_many', kind=kind) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="q" value="{{ q }}">
+        <div class="picker">
+          {% for item in off_list %}
+            <label class="check picker-item {{ 'muted' if item.case_of or item.too_long }}">
+              <input type="checkbox" name="codes" value="{{ item.value }}" {{ 'disabled' if item.case_of or item.too_long }}>
+              <code>{{ item.value }}</code> <span class="meta">{{ item.n }} ad{{ 's' if item.n != 1 }}</span>
+              {% if item.case_of %}<span class="meta">&middot; differs from "{{ item.case_of }}" only by capitals; merge it instead</span>{% endif %}
+              {% if item.too_long %}<span class="meta">&middot; too long for the list; merge it instead</span>{% endif %}
+            </label>
+          {% endfor %}
+        </div>
+        {% if off_total > off_list|length %}<p class="hint">Showing the {{ off_list|length }} most used. Use Find to narrow the list.</p>{% endif %}
+        <div class="form-actions"><button type="submit">Add ticked values to the list</button></div>
+      </form>
+    {% else %}
+      <p>Every value used on ads is on the list{{ ' (for this search)' if q }}.</p>
+    {% endif %}
+  </section>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Lookup lists{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    <h2>Lookup lists</h2>
+    <p class="notice">
+      Each list sets the allowed values for one field on the ad form. While a list is empty, the field stays free text.
+      Once it has active entries, the field becomes a dropdown. Older ads keep their existing value, marked "(legacy)".
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>List</th><th class="num">Entries</th><th class="num">Active</th>
+          <th class="num">Different values on ads</th><th class="num">Ads using values not on the list</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in summary %}
+          <tr>
+            <td><a href="{{ url_for('admin.lookup_list', kind=s.kind) }}"><strong>{{ s.spec.title }}</strong></a>
+              <div class="meta">Ad field: {{ s.spec.field_label }}</div></td>
+            <td class="num">{{ s.entries }}</td>
+            <td class="num">{{ s.active }}</td>
+            <td class="num">{{ '{:,}'.format(s.values_in_use) }}</td>
+            <td class="num">{{ '{:,}'.format(s.ads_off_list) }} <span class="meta">({{ s.values_off_list }} values)</span></td>
+            <td class="nowrap">
+              <a href="{{ url_for('admin.lookup_list', kind=s.kind) }}">Manage list</a> &middot;
+              <a href="{{ url_for('admin.normalization', domain=s.kind) }}">Merge spellings</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <p class="hint">
+      Suggested order: first merge the spellings that mean the same thing (for example "1/4 pg" and "1/4 page"),
+      then add the remaining values to the list. Billed is not on the ad form yet; its list is ready for when it is.
+    </p>
+  </section>
+{% endblock %}

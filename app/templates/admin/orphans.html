@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% import '_form.html' as f %}
+{% block title %}Orphan ads{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    <h2>Orphan ads <small>{{ '{:,}'.format(total_ads) }} ads under {{ '{:,}'.format(total_groups) }} account numbers that are not in Accounts</small></h2>
+    <p class="notice">
+      Each group is the set of ads Access recorded under one account number that has no matching account.
+      Attach them to the right account, or create the missing account. The original number is kept on each ad.
+    </p>
+
+    <form method="get" class="filters filters-search">
+      <label>
+        Find
+        <input name="q" value="{{ q }}" placeholder="Old account number, ad description, or notes">
+      </label>
+      <div class="filter-actions">
+        <button type="submit">Find</button>
+        <a href="{{ url_for('admin.orphans') }}">Clear</a>
+      </div>
+    </form>
+
+    <datalist id="dl-accounts">
+      {% for number, name in accounts %}<option value="{{ number }}">{{ name or '' }}</option>{% endfor %}
+    </datalist>
+
+    {% for grp in groups %}
+      {% set d = details[grp.legacy] %}
+      <article class="orphan-group">
+        <header>
+          <h3>Old account <code>{{ grp.legacy or '(blank)' }}</code></h3>
+          <span class="meta">
+            {{ grp.ad_count }} ad{{ 's' if grp.ad_count != 1 }}
+            &middot; {{ f.money(grp.total) or '$0.00' }}
+            &middot; run {{ f.fmt_date(grp.first_run) or '?' }}{% if grp.last_run != grp.first_run %} to {{ f.fmt_date(grp.last_run) }}{% endif %}
+          </span>
+        </header>
+
+        <table class="compact">
+          <tbody>
+            {% for ad in d.ads %}
+              <tr>
+                <td class="nowrap"><a href="{{ url_for('main.ad_detail', ad_id=ad.id) }}">#{{ ad.id }}</a></td>
+                <td class="nowrap">{{ f.fmt_date(ad.date_run) }}</td>
+                <td>{{ ad.description or '' }}</td>
+                <td>{{ (ad.ad_notes or '')|truncate(60) }}</td>
+                <td class="num">{{ f.money(ad.amount) }}</td>
+              </tr>
+            {% endfor %}
+            {% if grp.ad_count > d.ads|length %}
+              <tr><td colspan="5" class="meta">and {{ grp.ad_count - d.ads|length }} more</td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+
+        <div class="orphan-actions">
+          <form method="post" action="{{ url_for('admin.resolve_orphans') }}" class="inline-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="legacy" value="{{ grp.legacy }}">
+            <input type="hidden" name="action" value="attach">
+            <input type="hidden" name="q" value="{{ q }}">
+            <input type="hidden" name="page" value="{{ page }}">
+            <label>
+              Attach to account
+              <input name="account_number" list="dl-accounts" value="{{ d.suggestion or '' }}" placeholder="Account #" size="10" required>
+            </label>
+            <button type="submit">Attach {{ grp.ad_count }}</button>
+            {% if d.suggestion %}
+              <span class="hint">Suggested: {{ d.suggestion }} ({{ suggestion_names.get(d.suggestion) or 'no name' }})</span>
+            {% endif %}
+          </form>
+
+          {% if d.can_create %}
+            <form method="post" action="{{ url_for('admin.resolve_orphans') }}" class="inline-form">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="legacy" value="{{ grp.legacy }}">
+              <input type="hidden" name="action" value="create">
+              <input type="hidden" name="q" value="{{ q }}">
+              <input type="hidden" name="page" value="{{ page }}">
+              <label>
+                or create account {{ grp.legacy|upper }} named
+                <input name="advertiser" placeholder="Advertiser name" required>
+              </label>
+              <button type="submit" class="button-secondary">Create and attach</button>
+            </form>
+          {% endif %}
+        </div>
+      </article>
+    {% else %}
+      <p>{{ 'No orphan ads match.' if q else 'No orphan ads. Every ad is linked to an account.' }}</p>
+    {% endfor %}
+
+    {% if pages > 1 %}
+      <nav class="pager">
+        {% if page > 1 %}<a href="{{ url_for('admin.orphans', page=page - 1, q=q or None) }}">&laquo; Previous</a>{% endif %}
+        <span>Page {{ page }} of {{ pages }}</span>
+        {% if page < pages %}<a href="{{ url_for('admin.orphans', page=page + 1, q=q or None) }}">Next &raquo;</a>{% endif %}
+      </nav>
+    {% endif %}
+  </section>
+{% endblock %}

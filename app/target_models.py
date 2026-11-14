@@ -90,6 +90,7 @@ class AdPlacement(db.Model):
 
 class SalesRep(db.Model):
     __tablename__ = "sales_reps"
+    __audited__ = True
 
     id = db.Column(db.SmallInteger, primary_key=True, autoincrement=True)
     code = db.Column(db.String(50), nullable=False, unique=True)
@@ -99,6 +100,7 @@ class SalesRep(db.Model):
 
 class AdSize(db.Model):
     __tablename__ = "ad_sizes"
+    __audited__ = True
 
     id = db.Column(db.SmallInteger, primary_key=True, autoincrement=True)
     code = db.Column(db.String(50), nullable=False, unique=True)
@@ -108,6 +110,7 @@ class AdSize(db.Model):
 
 class AdSection(db.Model):
     __tablename__ = "ad_sections"
+    __audited__ = True
 
     id = db.Column(db.SmallInteger, primary_key=True, autoincrement=True)
     code = db.Column(db.String(50), nullable=False, unique=True)
@@ -117,6 +120,7 @@ class AdSection(db.Model):
 
 class BillingStatus(db.Model):
     __tablename__ = "billing_statuses"
+    __audited__ = True
 
     id = db.Column(db.SmallInteger, primary_key=True, autoincrement=True)
     code = db.Column(db.String(50), nullable=False, unique=True)
@@ -126,6 +130,7 @@ class BillingStatus(db.Model):
 
 class AdNormalizationMap(db.Model):
     __tablename__ = "ad_normalization_map"
+    __audited__ = True
 
     id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
     domain = db.Column(db.Enum("size", "section", "sales", "billed", name="normalization_domain"), nullable=False)

@@ -2,6 +2,23 @@
 {% import '_form.html' as f %}
 {% block title %}{{ 'Edit ad #' ~ ad.id if ad else 'New ad' }}{% endblock %}
 
+{# A dropdown when the field's lookup list has entries; otherwise free text with suggestions. #}
+{% macro pick(fld, options, datalist_id) -%}
+  {%- if options -%}
+    <label class="{{ 'has-error' if fld.errors }}">
+      <span>{{ fld.label.text }}</span>
+      <select name="{{ fld.name }}" id="{{ fld.id }}">
+        {%- for value, text in options %}
+          <option value="{{ value }}" {{ 'selected' if (fld.data or '') == value }}>{{ text }}</option>
+        {%- endfor %}
+      </select>
+      {%- for err in fld.errors %}<small class="field-error">{{ err }}</small>{% endfor %}
+    </label>
+  {%- else -%}
+    {{ f.field(fld, list=datalist_id) }}
+  {%- endif -%}
+{%- endmacro %}
+
 {% block content %}
   <div class="record-nav">
     {% if account %}
@@ -28,11 +45,11 @@
         {{ f.field(form.amount) }}
 
         {{ f.field(form.commission_pct) }}
-        {{ f.field(form.sales_rep_raw, list='dl-sales') }}
+        {{ pick(form.sales_rep_raw, choices.sales_rep_raw, 'dl-sales') }}
         {{ f.field(form.authorized_by) }}
 
-        {{ f.field(form.size_raw, list='dl-size') }}
-        {{ f.field(form.section_raw, list='dl-section') }}
+        {{ pick(form.size_raw, choices.size_raw, 'dl-size') }}
+        {{ pick(form.section_raw, choices.section_raw, 'dl-section') }}
         {{ f.field(form.ad_page) }}
 
         {{ f.field(form.run_code) }}
@@ -42,7 +59,7 @@
         {{ f.field(form.description, cls='span-3') }}
         {{ f.field(form.ad_notes, cls='span-3') }}
       </div>
-      <p class="hint">Comm %: enter 10 for 10%. Size, Section, and Sales suggest values already in use; you can still type a new one.</p>
+      <p class="hint">Comm %: enter 10 for 10%. Sales, Size, and Section offer the values on their lookup lists; where a list is still empty, they suggest values already in use.</p>
 
       {{ f.datalist('dl-sales', suggestions.sales) }}
       {{ f.datalist('dl-size', suggestions.size) }}

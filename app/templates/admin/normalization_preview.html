@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Confirm merge{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    <h2>Confirm merge <small>{{ spec.field_label }}</small></h2>
+
+    {% if total %}
+      <p>
+        <strong>{{ '{:,}'.format(total) }} ad{{ 's' if total != 1 }}</strong> will change to
+        <code>{{ target }}</code>:
+      </p>
+      <table class="compact narrow">
+        <thead><tr><th>Current value</th><th class="num">Ads</th></tr></thead>
+        <tbody>
+          {% for value, n in per_value %}
+            <tr><td><code>{{ value }}</code></td><td class="num">{{ '{:,}'.format(n) }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No ads need to change: every ticked value is already <code>{{ target }}</code>.</p>
+    {% endif %}
+
+    {% if case_clash %}
+      <p class="callout">The list already has this value with different capitals. Use the list's spelling so the ads match it.</p>
+    {% endif %}
+
+    <form method="post" action="{{ url_for('admin.normalization_merge', kind=kind) }}" class="record-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="target" value="{{ target }}">
+      {% for v in values %}<input type="hidden" name="values" value="{{ v }}">{% endfor %}
+      {% if not target_on_list and not case_clash %}
+        <label class="check"><input type="checkbox" name="add_to_list" value="1" checked> Also add <code>{{ target }}</code> to the {{ spec.title|lower }} list</label>
+      {% endif %}
+      <div class="form-actions">
+        <button type="submit" {{ 'disabled' if not total }}>Merge {{ '{:,}'.format(total) }} ads</button>
+        <a href="{{ url_for('admin.normalization', domain=kind, q=q or None) }}">Cancel</a>
+      </div>
+    </form>
+  </section>
+{% endblock %}

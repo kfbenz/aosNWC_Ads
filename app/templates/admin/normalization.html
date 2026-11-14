@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% import '_form.html' as f %}
+{% block title %}Merge spellings{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    <h2>Merge spellings <small>combine values that mean the same thing</small></h2>
+
+    <nav class="tabs" aria-label="Field">
+      {% for k, s in lookups.items() %}
+        <a href="{{ url_for('admin.normalization', domain=k) }}" class="{{ 'active' if k == kind }}">{{ s.field_label }}</a>
+      {% endfor %}
+    </nav>
+
+    <p class="notice">
+      Tick every spelling that means the same thing, enter the value to keep, and preview.
+      Every ad using a ticked spelling is changed to that value; each change is recorded in the audit log.
+    </p>
+
+    <form method="get" class="filters filters-search">
+      <input type="hidden" name="domain" value="{{ kind }}">
+      <label>Find <input name="q" value="{{ q }}" placeholder="Part of a {{ spec.field_label|lower }} value, e.g. 1/4"></label>
+      <div class="filter-actions"><button type="submit">Find</button><a href="{{ url_for('admin.normalization', domain=kind) }}">Clear</a></div>
+    </form>
+
+    <p class="meta">{{ '{:,}'.format(distinct_total) }} different {{ spec.field_label|lower }} values on ads{% if q %}; {{ values_total }} match "{{ q }}"{% endif %}.
+      {% if values_total > values|length %}Showing the {{ values|length }} most used.{% endif %}</p>
+
+    {% if values %}
+      <form method="post" action="{{ url_for('admin.normalization_preview', kind=kind) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="q" value="{{ q }}">
+        <div class="picker">
+          {% for item in values %}
+            <label class="check picker-item">
+              <input type="checkbox" name="values" value="{{ item.value }}">
+              <code>{{ item.value }}</code> <span class="meta">{{ '{:,}'.format(item.n) }} ad{{ 's' if item.n != 1 }}</span>
+              {% if item.on_list %}<span class="pill pill-current">on list</span>{% endif %}
+            </label>
+          {% endfor %}
+        </div>
+
+        <div class="inline-form merge-target">
+          <label>Merge ticked values into
+            <input name="target" list="dl-targets" maxlength="50" required placeholder="Value to keep">
+          </label>
+          <datalist id="dl-targets">
+            {% for c in list_codes %}<option value="{{ c }}">{% endfor %}
+            {% for item in values[:100] %}<option value="{{ item.value }}">{% endfor %}
+          </datalist>
+          <button type="submit">Preview merge</button>
+        </div>
+      </form>
+    {% else %}
+      <p>No values found.</p>
+    {% endif %}
+  </section>
+
+  {% if recent %}
+    <section class="panel">
+      <h2>Recent merges for {{ spec.field_label }}</h2>
+      <table class="compact">
+        <thead><tr><th>Was</th><th>Now</th><th>By</th><th>When (UTC)</th></tr></thead>
+        <tbody>
+          {% for r in recent %}
+            <tr>
+              <td><code>{{ r.raw_value }}</code></td>
+              <td><code>{{ r.normalized_value }}</code></td>
+              <td>{{ r.approved_by or '' }}</td>
+              <td class="nowrap">{{ r.approved_at.strftime('%m/%d/%Y %H:%M') if r.approved_at else '' }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+  {% endif %}
+{% endblock %}

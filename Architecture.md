@@ -1,5 +1,7 @@
 # Northwest Catholic Ads - Target Architecture
 
+> **Historical planning document (August 2026).** It records the original migration plan. For the system as built, see [docs/architecture.md](docs/architecture.md). Some plans here changed: there is no parallel run (see decision 11 in [decisions.md](decisions.md)), and open work is tracked in [docs/backlog.md](docs/backlog.md).
+
 Date: 2026-08-20
 Author: Migration Working Draft
 Status: Updated to match current repository baseline

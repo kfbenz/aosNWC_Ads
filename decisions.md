@@ -22,6 +22,8 @@ Implementation status:
 
 ## Decision 2: Treat migration as live cutover with parallel run
 
+Status: Superseded by Decision 11 (single cutover, no parallel run).
+
 Decision:
 Plan a live migration with reconciliation and one publication-cycle parallel operation.
 
@@ -138,6 +140,106 @@ Rationale:
 - Data quality and workflow parity are higher-risk items than framework choice.
 - Reduces project risk by avoiding platform churn during migration.
 
+Transition triggers (any one):
+- Need public or partner API contracts with OpenAPI-first governance.
+- Need generated client SDKs from an API schema.
+- Need async-heavy integration patterns where the Flask design becomes limiting.
+
+Guardrails:
+- No schema rewrite during the framework transition.
+- Keep SQLAlchemy models and migration history unchanged.
+- Keep MariaDB table names and keys stable.
+- Preserve report outputs and reconciliation checks as release gates.
+
+Phased approach:
+1. Extract business logic from Flask routes into service modules.
+2. Add API tests against Flask behavior for baseline parity.
+3. Stand up a FastAPI app using the same models and service modules.
+4. Run FastAPI behind an internal path or subdomain for shadow traffic.
+5. Compare responses and performance on real workloads.
+6. Cut over by switching the reverse-proxy upstream from Flask to FastAPI.
+
+Rollback: keep the Flask deployment and systemd unit until post-cutover sign-off, and revert the Nginx upstream if parity or stability checks fail.
+
+## Decision 11: Single cutover, no parallel run
+
+Date: 2026-11
+
+Decision:
+Build every Access form, report, and export in NWC Ads first, then switch over in one step. Staff do not enter data in both systems.
+
+Rationale:
+- Double entry for a publication cycle is error-prone and would be resisted by staff.
+- Reconciliation of the imported data against Access (counts and totals) gives the no-loss assurance that the parallel run was meant to provide.
+
+Consequences:
+- The final import must be repeatable and verified (backlog C-04, C-05).
+- Data cleanup in NWC Ads happens after the final import.
+
+## Decision 12: Microsoft Entra ID sign-in with three app roles
+
+Date: 2026-11
+
+Decision:
+Users sign in with their Archdiocese Microsoft accounts. Access is controlled by the Entra app roles `NWCAds.Viewer`, `NWCAds.Editor`, and `NWCAds.Admin`, which IT assigns. NWC Ads stores no passwords and keeps no user table.
+
+Rationale:
+- Leavers lose access when IT disables their account, without a separate step in NWC Ads.
+- Three nested roles cover the Access usage patterns (read, enter data, administer).
+
+## Decision 13: Audit every data change in the application
+
+Date: 2026-11
+
+Decision:
+Record every insert, update, and delete of business data in an `audit_log` table, in the same transaction as the change, through SQLAlchemy session events. All data changes go through the ORM.
+
+Rationale:
+- Access had no change history. Pricing, commission, and run-date edits need accountability.
+- Application-level auditing records the signed-in person, which database triggers could not.
+
+## Decision 14: Keep free-text vocabularies, and constrain them with lookup lists
+
+Date: 2026-11
+
+Decision:
+Keep Sales, Size, Section, and Billed as text on each ad. Admins clean them up with "merge spellings", and lookup lists restrict new entries. Do not convert them to foreign keys now.
+
+Rationale:
+- Converting about 830 size spellings to keys would require every mapping decision before go-live.
+- Text with lookup lists lets each vocabulary be cleaned up gradually, after cutover, with a full audit trail, and preserves history exactly.
+
+## Decision 15: Detect edits by two people at once with a content hash
+
+Date: 2026-11
+
+Decision:
+Edit forms carry a hash of the record's values. A save is refused if the record changed after the form was opened.
+
+Rationale:
+- The `updated_at` timestamp has one-second resolution and missed edits made within the same second.
+
+## Decision 16: Host on a single Azure VM with a local MariaDB
+
+Date: 2026-11
+
+Decision:
+Run Nginx, Gunicorn, and MariaDB on one Debian VM in Azure, protected by TLS, an Nginx IP allow list, and Entra sign-in.
+
+Rationale:
+- The data volume and user count are small. A managed database service would add cost without benefit at this size.
+- One server keeps operations simple for one developer.
+
+Consequence:
+- Backups are the main protection against VM loss (backlog C-02).
+
+## Decision 17: Apache License 2.0
+
+Date: 2026-11
+
+Decision:
+All code is copyright the Archdiocese of Seattle (author Kevin F Benz) and licensed under the Apache License 2.0, with a header in each source file.
+
 ## Open decisions requiring stakeholder input
 
 1. Concurrent user count and usage pattern
@@ -154,5 +256,7 @@ Rationale:
 3. Resolve orphan and null-account ad rows.
 4. Finalize target schema and migrate data via staging pipeline.
 5. Build API, UI, and reports with reconciliation checks.
-6. Run in parallel for one publication cycle.
+6. Final import, reconciliation, and single cutover (Decision 11).
 7. Retire Access after signed acceptance.
+
+Current open items and business decisions are tracked in [docs/backlog.md](docs/backlog.md).

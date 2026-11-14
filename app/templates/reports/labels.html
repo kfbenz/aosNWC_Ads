@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Mailing labels{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    <h2>Mailing Labels by Directory Year</h2>
+    <p class="notice">Accounts whose Directory Years include the year you enter, sorted by advertiser.</p>
+
+    <form method="get" class="form-grid">
+      <label>Directory year <input name="year" value="{{ year }}" placeholder="e.g. 2026" required></label>
+      <label>
+        Start at label (1&ndash;{{ per_sheet }})
+        <input type="number" name="start_at" min="1" max="{{ per_sheet }}" value="{{ start_at }}">
+      </label>
+      <label class="check"><input type="checkbox" name="contact" value="1" {{ 'checked' if include_contact }}> Include contact name</label>
+      <div class="filter-actions"><button type="submit">Find accounts</button></div>
+    </form>
+
+    {% if accounts is not none %}
+      <div class="report-actions">
+        <strong>{{ accounts|length }} label{{ 's' if accounts|length != 1 }}</strong>
+        {% if accounts %}
+          &middot; {{ ((accounts|length + start_at - 1) / per_sheet)|round(0, 'ceil')|int }} sheet(s)
+          <a class="button" href="{{ url_for('reports.labels', year=year, start_at=start_at, contact='1' if include_contact else None, format='pdf') }}" target="_blank">Open labels PDF</a>
+        {% endif %}
+      </div>
+      <p class="callout">
+        Labels are laid out for Avery 5160/8160 (30 per sheet, 1" &times; 2&#8541;").
+        In the print dialog, choose <strong>Actual size</strong> (100%), not "Fit to page".
+        Use "Start at label" to reuse a partly used sheet: 1 is top left, counting across.
+      </p>
+
+      {% if accounts %}
+        <table class="compact">
+          <thead><tr><th>Account</th><th>Advertiser</th><th>Address</th><th>City</th><th>Directory Years</th></tr></thead>
+          <tbody>
+            {% for a in accounts[:50] %}
+              <tr>
+                <td>{{ a.account_number }}</td>
+                <td>{{ a.advertiser or '' }}</td>
+                <td>{{ a.address1 or '' }}{% if a.address2 %}, {{ a.address2 }}{% endif %}</td>
+                <td>{{ a.city or '' }}{% if a.state_code %}, {{ a.state_code }}{% endif %} {{ a.postal_code or '' }}</td>
+                <td>{{ a.directory_years or '' }}</td>
+              </tr>
+            {% endfor %}
+            {% if accounts|length > 50 %}
+              <tr><td colspan="5" class="meta">and {{ accounts|length - 50 }} more (all are in the PDF)</td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+      {% else %}
+        <p>No accounts list {{ year }} in Directory Years.</p>
+      {% endif %}
+    {% endif %}
+  </section>
+{% endblock %}

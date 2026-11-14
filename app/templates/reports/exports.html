@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Exports{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    <h2>Exports by Run Date</h2>
+    <p class="notice">
+      Excel workbooks with one row per advertiser and description and one column per run date,
+      matching the two export buttons on the Access Dashboard.
+    </p>
+
+    <form method="get" class="form-grid">
+      <label>Starting run date <input type="date" name="start" value="{{ form.start.isoformat() }}" required></label>
+      <label>Ending run date <input type="date" name="end" value="{{ form.end.isoformat() }}" required></label>
+      <div class="filter-actions">
+        <button type="submit" name="kind" value="amount">Export amounts</button>
+        <button type="submit" name="kind" value="commission">Export commission earned</button>
+      </div>
+    </form>
+
+    <ul class="hint">
+      <li><strong>Amounts:</strong> sum of ad amounts per run date.</li>
+      <li><strong>Commission earned:</strong> amount &times; commission % per run date, for all ads in the range (including 0%), as in Access.</li>
+    </ul>
+  </section>
+{% endblock %}

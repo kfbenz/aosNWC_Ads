@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% import '_form.html' as fm %}
+{% block title %}Advertiser lists{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    <div class="no-print">
+      <h2>Advertiser Lists</h2>
+      <p class="notice">
+        Replaces the saved Access queries such as Christmas advertisers, Easter billing, Graduation, current advertisers,
+        e-mail lists, and parish lists. Filters are combined: an account must match all of them.
+      </p>
+
+      <form method="get" id="list-form" class="record-form list-form">
+        <input type="hidden" name="run" value="1">
+
+        <fieldset>
+          <legend>Ads that ran</legend>
+          <div class="form-grid">
+            <label>Run date from <input type="date" name="run_from" value="{{ f.run_from.isoformat() if f.run_from else '' }}"></label>
+            <label>Run date to <input type="date" name="run_to" value="{{ f.run_to.isoformat() if f.run_to else '' }}"></label>
+            <label>Specific issue dates <input name="issues" value="{{ f.issues_text }}" placeholder="12/1/2025, 12/1/2024"></label>
+            <label>Section contains <input name="section" value="{{ f.section }}" placeholder="e.g. grad, CSW, Xmas"></label>
+            <label>Sales rep <input name="rep" value="{{ f.rep }}" placeholder="e.g. KH"></label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Accounts</legend>
+          <div class="form-grid">
+            <label>Advertiser name contains <input name="advertiser" value="{{ f.advertiser }}"></label>
+            <label>Category contains <input name="category" value="{{ f.category }}" placeholder="e.g. parish, legal, sisters"></label>
+            <label>Directory year <input name="directory_year" value="{{ f.directory_year }}" placeholder="e.g. 2026"></label>
+          </div>
+          <div class="checkbox-row">
+            {% for key, (label, _col) in flags.items() %}
+              <label class="check"><input type="checkbox" name="flag_{{ key }}" value="1" {{ 'checked' if key in f.flags }}> {{ label }}</label>
+            {% endfor %}
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Output</legend>
+          <div class="checkbox-row">
+            <label class="check"><input type="radio" name="mode" value="advertisers" {{ 'checked' if f.mode == 'advertisers' }}> One row per advertiser (address list)</label>
+            <label class="check"><input type="radio" name="mode" value="ads" {{ 'checked' if f.mode == 'ads' }}> One row per ad</label>
+            <label class="check"><input type="checkbox" name="contact" value="1" {{ 'checked' if f.contact }}> Contact name on labels</label>
+          </div>
+        </fieldset>
+
+        <div class="form-actions">
+          <button type="submit" name="format" value="html">Show list</button>
+          <button type="submit" name="format" value="xlsx" class="button-secondary">Excel</button>
+          <button type="submit" name="format" value="csv" class="button-secondary">CSV</button>
+          <button type="submit" name="format" value="labels" class="button-secondary" formtarget="_blank">Mailing labels (PDF)</button>
+          <a href="{{ url_for('reports.advertiser_lists') }}">Clear</a>
+        </div>
+      </form>
+    </div>
+
+    {% if error %}
+      <p class="flash flash-error">{{ error }}</p>
+    {% endif %}
+
+    {% if rows is not none %}
+      <div class="report-actions no-print">
+        <strong>{{ '{:,}'.format(total) }} {{ 'advertisers' if f.mode == 'advertisers' else 'ads' }}</strong>
+        {% if f.mode == 'ads' %}&middot; total {{ fm.money(amount_total) }}{% endif %}
+        {% if total > rows|length %}<span class="hint">Showing the first {{ rows|length }}; Excel and CSV include all.</span>{% endif %}
+        <button type="button" onclick="window.print()">Print</button>
+      </div>
+
+      {% if rows %}
+        <div class="table-scroll">
+          <table class="report-table">
+            <thead><tr>{% for h in header %}<th>{{ h }}</th>{% endfor %}</tr></thead>
+            <tbody>
+              {% for row in rows %}
+                <tr>
+                  {% for v in row %}
+                    {% set col = header[loop.index0] %}
+                    {% if v is none %}<td></td>
+                    {% elif col in ('Run Date', 'Date Sold') %}<td class="nowrap">{{ fm.fmt_date(v) }}</td>
+                    {% elif col == 'Amount' %}<td class="num">{{ fm.money(v) }}</td>
+                    {% elif col == 'Comm %' %}<td class="num">{{ fm.pct(v) }}</td>
+                    {% elif col == 'Account' and loop.index0 == 0 and f.mode == 'advertisers' %}<td class="nowrap"><a href="{{ url_for('accounts.detail', account_number=v) }}">{{ v }}</a></td>
+                    {% else %}<td>{{ v }}</td>{% endif %}
+                  {% endfor %}
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p>Nothing matches these filters.</p>
+      {% endif %}
+    {% endif %}
+  </section>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% import '_form.html' as f %}
+{% block title %}Publication report{% endblock %}
+{% block head %}<style>@page { size: letter landscape; margin: 0.3in; }</style>{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    <div class="no-print">
+      <h2>Publication Report by Run Date</h2>
+      <p class="notice">Every ad running in one issue, sorted by advertiser. Prints landscape.</p>
+      <form method="get" class="filters filters-3">
+        <label>Run date <input type="date" name="date" value="{{ default.isoformat() }}" required></label>
+        <label>
+          or pick a recent issue
+          <select onchange="if (this.value) { this.form.date.value = this.value; this.form.submit(); }">
+            <option value="">Choose...</option>
+            {% for d in issue_dates %}
+              <option value="{{ d.isoformat() }}" {{ 'selected' if run_date == d }}>{{ f.fmt_date(d) }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <div></div>
+        <div class="filter-actions"><button type="submit">Run report</button></div>
+      </form>
+    </div>
+
+    {% if rows is not none %}
+      <div class="report-actions no-print">
+        <button type="button" onclick="window.print()">Print / Save as PDF</button>
+        <a href="{{ url_for('reports.publication', date=run_date.isoformat(), format='csv') }}">Download CSV</a>
+      </div>
+
+      <h3 class="report-title">Publication Report for {{ run_date.strftime('%A, %B %d, %Y') }}</h3>
+      <p class="report-sub">{{ rows|length }} ads &middot; total {{ f.money(total) }}</p>
+
+      {% if rows %}
+        <table class="report-table grid">
+          <thead>
+            <tr>
+              <th class="num">#</th><th>Acct#</th><th>Advertiser</th><th>Contact</th><th>Description/Category</th>
+              <th>Size</th><th>Page</th><th>Notes</th><th>Run #</th><th>Billing</th><th class="num">Amt</th><th class="num">Comm</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in rows %}
+              <tr>
+                <td class="num">{{ loop.index }}</td>
+                <td class="nowrap">{{ r.ad.account_number or r.ad.legacy_account_number or '' }}</td>
+                <td>{{ r.advertiser }}</td>
+                <td>{{ r.account.contact_name if r.account and r.account.contact_name else '' }}</td>
+                <td>{{ r.ad.description or '' }}</td>
+                <td>{{ r.ad.size_raw or '' }}</td>
+                <td>{{ r.ad.ad_page or '' }}</td>
+                <td>{{ r.ad.ad_notes or '' }}</td>
+                <td>{{ r.ad.run_code or '' }}</td>
+                <td>{{ r.ad.bill_number or '' }}</td>
+                <td class="num">{{ f.money(r.ad.amount) }}</td>
+                <td class="num">{{ f.pct(r.ad.commission_percent) }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p>No ads are scheduled to run on {{ f.fmt_date(run_date) }}.</p>
+      {% endif %}
+      <p class="printed-on">Printed {{ f.fmt_date(today) }}</p>
+    {% endif %}
+  </section>
+{% endblock %}

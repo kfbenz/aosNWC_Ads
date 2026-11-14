@@ -6,16 +6,17 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{% block title %}{% endblock %}{{ ' – ' if self.title() }}NWC Ads</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    {% block head %}{% endblock %}
   </head>
   <body>
     {% if auth_mode == 'dev' %}
-      <div class="dev-banner" role="status">
+      <div class="dev-banner no-print" role="status">
         Development mode: sign-in is disabled and everyone acts as {{ g.user.role if g.user else '' }}.
         Keep this server behind the IP allow list.
       </div>
     {% endif %}
 
-    <header class="site-header">
+    <header class="site-header no-print">
       <div class="brand"><a href="{{ url_for('main.index') }}">NWC Ads</a></div>
 
       {% if menu %}

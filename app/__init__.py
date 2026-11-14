@@ -1,3 +1,5 @@
+from datetime import date
+
 from flask import Flask, render_template
 from flask_wtf.csrf import CSRFProtect
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -35,11 +37,13 @@ def create_app(config_object=Config) -> Flask:
     from app.accounts import accounts_bp
     from app.admin import admin_bp
     from app.menu import build_menu
+    from app.reports import reports_bp
     from app.routes import main_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(accounts_bp)
+    app.register_blueprint(reports_bp)
     app.register_blueprint(admin_bp)
 
     @app.context_processor
@@ -47,6 +51,7 @@ def create_app(config_object=Config) -> Flask:
         return {
             "menu": build_menu(),
             "auth_mode": app.config["AUTH_MODE"],
+            "today": date.today(),
         }
 
     @app.errorhandler(403)

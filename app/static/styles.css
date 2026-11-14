@@ -521,6 +521,136 @@ table.compact td {
   color: var(--error);
 }
 
+/* Reports */
+.report-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+  margin: 0.5rem 0 1rem;
+}
+
+.report-actions a {
+  color: var(--accent);
+}
+
+.report-title {
+  margin: 0 0 0.25rem;
+}
+
+.report-sub {
+  margin: 0 0 0.75rem;
+  color: #5a5249;
+}
+
+.report-table th,
+.report-table td {
+  padding: 0.3rem 0.4rem;
+  font-size: 0.88rem;
+}
+
+.report-table .group-head td {
+  background: #f6f2ec;
+  font-weight: 700;
+}
+
+.report-table .subtotal td,
+.report-table .grand-total td {
+  font-weight: 700;
+  border-top: 2px solid var(--text);
+}
+
+.report-table.grid td,
+.report-table.grid th {
+  border: 1px solid #b9b0a4;
+}
+
+.list-form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.checkbox-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.2rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  gap: 0.75rem 1rem;
+  align-items: end;
+}
+
+.callout {
+  background: #fff8e6;
+  border: 1px solid #ecd9a6;
+  border-radius: 6px;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.9rem;
+}
+
+.printed-on {
+  display: none;
+}
+
+@media print {
+  body {
+    background: #ffffff;
+    font-size: 10pt;
+  }
+
+  .no-print,
+  .flash-list {
+    display: none !important;
+  }
+
+  .content {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .panel {
+    border: none;
+    padding: 0;
+  }
+
+  .report-table {
+    display: table !important;
+  }
+
+  .report-table thead {
+    display: table-header-group !important;
+  }
+
+  .report-table tr {
+    display: table-row !important;
+    page-break-inside: avoid;
+    border: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .report-table td,
+  .report-table th {
+    display: table-cell !important;
+    font-size: 8.5pt;
+  }
+
+  .printed-on {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 8pt;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+}
+
 @media (max-width: 800px) {
   .filters,
   .filters-3,

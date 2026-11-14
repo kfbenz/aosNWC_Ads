@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{% block title %}{% endblock %}{{ ' – ' if self.title() }}NWC Ads</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libertinus+Serif:wght@400;600;700&family=Work+Sans:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     {% block head %}{% endblock %}
   </head>
@@ -16,8 +19,23 @@
       </div>
     {% endif %}
 
+    <div class="brand-bar no-print" aria-hidden="true"></div>
     <header class="site-header no-print">
-      <div class="brand"><a href="{{ url_for('main.index') }}">NWC Ads</a></div>
+      <div class="masthead">
+        <a class="wordmark" href="{{ url_for('main.index') }}" aria-label="Northwest Catholic Advertising, home">
+          <span class="wordmark-title">Northwest Catholic</span>
+          <span class="wordmark-sub">Advertising</span>
+        </a>
+        {% if g.user %}
+          <div class="user-box">
+            <span class="user-name">{{ g.user.name }}</span>
+            <span class="role-badge">{{ g.user.role or 'No role' }}</span>
+            {% if auth_mode == 'entra' %}
+              <a href="{{ url_for('auth.logout') }}">Sign out</a>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
 
       {% if menu %}
         <nav class="main-nav" aria-label="Main menu">
@@ -51,16 +69,6 @@
           </ul>
         </nav>
       {% endif %}
-
-      {% if g.user %}
-        <div class="user-box">
-          <span class="user-name">{{ g.user.name }}</span>
-          <span class="role-badge">{{ g.user.role or 'No role' }}</span>
-          {% if auth_mode == 'entra' %}
-            <a href="{{ url_for('auth.logout') }}">Sign out</a>
-          {% endif %}
-        </div>
-      {% endif %}
     </header>
 
     <main class="content">
@@ -76,5 +84,18 @@
 
       {% block content %}{% endblock %}
     </main>
+
+    <footer class="site-footer no-print">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <span class="wordmark-title">Northwest Catholic</span>
+          <span class="wordmark-sub">Advertising</span>
+        </div>
+        <div class="footer-meta">
+          <span>&copy; {{ today.year }} Archdiocese of Seattle</span>
+          <span>For internal use by Northwest Catholic staff</span>
+        </div>
+      </div>
+    </footer>
   </body>
 </html>

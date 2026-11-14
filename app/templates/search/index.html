@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% import '_form.html' as f %}
+{% block title %}Search{% endblock %}
+
+{% macro text_input(name, label, list=none) -%}
+  <label>
+    <span>{{ label }}</span>
+    <input name="{{ name }}" value="{{ v[name] }}" {% if list %}list="{{ list }}"{% endif %}>
+  </label>
+{%- endmacro %}
+
+{% block content %}
+  <section class="panel">
+    <h2>Search Advertisers and Ads</h2>
+
+    <details class="search-help" {{ 'open' if not submitted }}>
+      <summary>How searching works</summary>
+      <ul class="hint">
+        <li>Type part of a value to find it anywhere in that field: <code>Mary</code> finds "St. Mary Parish".</li>
+        <li>Use <code>*</code> (any characters) and <code>?</code> (one character) for exact patterns, as in Access: <code>St.*</code> finds values that start with "St.".</li>
+        <li><strong>OR</strong> finds accounts matching <em>any</em> filled-in field. <strong>AND</strong> finds accounts matching <em>all</em> of them; ad fields must then match the same ad.</li>
+        <li>The status boxes always narrow the results, whichever you choose.</li>
+      </ul>
+    </details>
+
+    {% for err in errors %}
+      <p class="flash flash-error">{{ err }}</p>
+    {% endfor %}
+
+    <form method="get" class="record-form search-form" action="{{ url_for('search.index') }}">
+      <input type="hidden" name="run" value="1">
+
+      <div class="checkbox-row search-mode">
+        <strong>Match</strong>
+        <label class="check"><input type="radio" name="mode" value="or" {{ 'checked' if v.mode != 'and' }}> any field (OR)</label>
+        <label class="check"><input type="radio" name="mode" value="and" {{ 'checked' if v.mode == 'and' }}> all fields (AND)</label>
+      </div>
+
+      <div class="two-col">
+        <fieldset>
+          <legend>Contact</legend>
+          {% for name, label, _col in contact_fields %}
+            {{ text_input(name, label, 'dl-advertisers' if name == 'advertiser' else none) }}
+          {% endfor %}
+        </fieldset>
+
+        <div class="search-right">
+          <fieldset>
+            <legend>Client Information</legend>
+            {% for name, label, _col in client_fields %}
+              {{ text_input(name, label) }}
+            {% endfor %}
+            <div class="checks">
+              {% for key, label, _col in status_flags %}
+                <label class="check"><input type="checkbox" name="flag_{{ key }}" value="1" {{ 'checked' if key in flags }}> {{ label }}</label>
+              {% endfor %}
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Ad Information</legend>
+            <div class="grid-2">
+              {% for name, label, _col in ad_fields %}
+                {{ text_input(name, label) }}
+              {% endfor %}
+              <label><span>Date Sold from</span><input type="date" name="date_sold_from" value="{{ v.date_sold_from }}"></label>
+              <label><span>Date Sold to</span><input type="date" name="date_sold_to" value="{{ v.date_sold_to }}"></label>
+              <label><span>Date Run from</span><input type="date" name="date_run_from" value="{{ v.date_run_from }}"></label>
+              <label><span>Date Run to</span><input type="date" name="date_run_to" value="{{ v.date_run_to }}"></label>
+              <label><span>Amount from</span><input name="amount_min" value="{{ v.amount_min }}" inputmode="decimal"></label>
+              <label><span>Amount to</span><input name="amount_max" value="{{ v.amount_max }}" inputmode="decimal"></label>
+              <label><span>Comm % (e.g. 10)</span><input name="comm_pct" value="{{ v.comm_pct }}" inputmode="decimal"></label>
+            </div>
+          </fieldset>
+        </div>
+      </div>
+
+      <datalist id="dl-advertisers">
+        {% for a in advertisers %}<option value="{{ a }}">{% endfor %}
+      </datalist>
+
+      <div class="form-actions">
+        <button type="submit">Search</button>
+        <a href="{{ url_for('search.index') }}">Clear</a>
+      </div>
+    </form>
+  </section>
+
+  {% if rows is not none %}
+    <section class="panel" id="results">
+      <div class="panel-head">
+        <h2>Search Results <small>{{ '{:,}'.format(total) }} account{{ 's' if total != 1 }}{% if used %}, matching {{ 'all of' if v.mode == 'and' else 'any of' }}: {{ used|join(', ') }}{% endif %}</small></h2>
+        {% if total %}
+          <div class="actions">
+            <a href="{{ url_for('search.index', format='xlsx', **query_args) }}">Export addresses to Excel</a>
+            <a href="{{ url_for('search.index', format='csv', **query_args) }}">CSV</a>
+            <a href="{{ url_for('search.index', format='labels', **query_args) }}" target="_blank">Mailing labels (PDF)</a>
+          </div>
+        {% endif %}
+      </div>
+
+      {% if rows %}
+        <table>
+          <thead>
+            <tr>
+              <th>Account</th><th>Advertiser</th><th>Contact</th><th>City</th><th>Phone</th>
+              <th>Status</th><th class="num">Ads</th><th>Last run</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for account, ad_count, last_run in rows %}
+              <tr>
+                <td class="nowrap"><a href="{{ url_for('accounts.detail', account_number=account.account_number) }}">{{ account.account_number }}</a></td>
+                <td><a href="{{ url_for('accounts.detail', account_number=account.account_number) }}">{{ account.advertiser or '(no name)' }}</a></td>
+                <td>{{ account.contact_name or '' }}</td>
+                <td>{{ account.city or '' }}</td>
+                <td class="nowrap">{{ account.phone or '' }}</td>
+                <td>
+                  {% if account.is_current_advertiser %}<span class="pill pill-current">Current</span>{% endif %}
+                  {% if account.is_past_advertiser %}<span class="pill">Past</span>{% endif %}
+                  {% if account.is_prospect %}<span class="pill">Prospect</span>{% endif %}
+                  {% if account.is_email_list %}<span class="pill">E-mail</span>{% endif %}
+                </td>
+                <td class="num">{{ ad_count }}</td>
+                <td class="nowrap">{{ f.fmt_date(last_run) }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        {% if pages > 1 %}
+          <nav class="pager">
+            {% if page > 1 %}<a href="{{ url_for('search.index', page=page - 1, **query_args) }}#results">&laquo; Previous</a>{% endif %}
+            <span>Page {{ page }} of {{ pages }}</span>
+            {% if page < pages %}<a href="{{ url_for('search.index', page=page + 1, **query_args) }}#results">Next &raquo;</a>{% endif %}
+          </nav>
+        {% endif %}
+      {% else %}
+        <p>No accounts match. With OR, try fewer letters; with AND, try fewer fields.</p>
+      {% endif %}
+    </section>
+  {% endif %}
+{% endblock %}

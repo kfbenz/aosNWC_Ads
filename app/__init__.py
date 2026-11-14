@@ -54,10 +54,12 @@ def create_app(config_object=Config) -> Flask:
     from app.menu import build_menu
     from app.reports import reports_bp
     from app.routes import main_bp
+    from app.search import search_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(accounts_bp)
+    app.register_blueprint(search_bp)
     app.register_blueprint(reports_bp)
     app.register_blueprint(admin_bp)
 

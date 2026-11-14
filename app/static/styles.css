@@ -1,12 +1,20 @@
+/* Copyright 2026 Archdiocese of Seattle. Author: Kevin F Benz. Licensed under the Apache License, Version 2.0. */
+
+/* Look and feel follows Northwest Catholic: serif masthead, small-caps sans navigation,
+   charcoal text on white, hairline grey rules, cyan accent. */
 :root {
-  --bg: #f4f1ec;
-  --text: #222222;
+  --bg: #f5f6f7;
+  --text: #303030;
+  --muted: #5a5a5a;
   --surface: #ffffff;
-  --border: #d7cfc3;
-  --accent: #7c261e;
-  --accent-hover: #5e1d17;
+  --border: #dedede;
+  --brand-cyan: #00a3da;      /* decorative only: bars, underlines (fails contrast as text on white) */
+  --accent: #00769f;          /* links and buttons: deeper cyan, 4.9:1 on white */
+  --accent-hover: #005a7a;
   --success: #1f6b43;
-  --error: #9a2c2c;
+  --error: #b42318;
+  --font-serif: "Libertinus Serif", Georgia, "Times New Roman", serif;
+  --font-sans: "Work Sans", "Helvetica Neue", Arial, sans-serif;
 }
 
 * {
@@ -15,29 +23,22 @@
 
 body {
   margin: 0;
-  background: radial-gradient(circle at top right, #ece6dd, var(--bg) 45%);
-  color: var(--text);
-  font-family: "Georgia", "Times New Roman", serif;
-}
-
-.site-header {
-  padding: 0.6rem 1.5rem;
-  border-bottom: 1px solid var(--border);
-  background: #fff8f0;
+  min-height: 100vh;
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem 1.5rem;
-  align-items: center;
-}
-
-.brand {
-  font-size: 1.35rem;
-  font-weight: 700;
-}
-
-.site-header a {
+  flex-direction: column;
+  background: var(--bg);
   color: var(--text);
-  text-decoration: none;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  color: var(--text);
 }
 
 .dev-banner {
@@ -45,21 +46,99 @@ body {
   color: #664d03;
   border-bottom: 1px solid #e6d28a;
   padding: 0.4rem 1.5rem;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
-/* Main menu */
+/* ---------------------------------------------------------------- header */
+.brand-bar {
+  height: 5px;
+  background: var(--brand-cyan);
+}
+
+.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.site-header a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.masthead {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0.9rem 1.25rem 0.7rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.wordmark {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.wordmark-title {
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.wordmark-sub {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  padding-left: 0.75rem;
+  border-left: 1px solid var(--border);
+}
+
+.user-box {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.site-header .user-box a {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.role-badge {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  color: var(--accent);
+  border: 1px solid #a7e1f3;
+  background: #eef9fd;
+}
+
+/* Main menu: small spaced capitals, cyan underline for the current section */
 .main-nav {
-  flex: 1;
+  border-top: 1px solid var(--border);
 }
 
 .main-nav > ul {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 0.75rem;
   list-style: none;
-  margin: 0;
-  padding: 0;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.25rem;
 }
 
 .main-nav li {
@@ -70,23 +149,32 @@ body {
 .main-nav > ul > li > span,
 .main-nav > ul > li > button {
   display: block;
-  padding: 0.45rem 0.75rem;
-  border-radius: 6px;
+  padding: 0.7rem 0.75rem 0.6rem;
+  border: none;
+  border-bottom: 3px solid transparent;
+  border-radius: 0;
   background: none;
   color: var(--text);
-  font: inherit;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
 }
 
 .main-nav > ul > li > a:hover,
 .main-nav > ul > li > button:hover,
 .main-nav > ul > li.has-sub:focus-within > button {
-  background: #f1e6d8;
+  background: none;
+  color: var(--accent);
 }
 
 .main-nav > ul > li.active > a,
 .main-nav > ul > li.active > button {
-  background: var(--accent);
-  color: #ffffff;
+  background: none;
+  color: var(--text);
+  border-bottom-color: var(--brand-cyan);
 }
 
 .main-nav .sub {
@@ -101,8 +189,8 @@ body {
   padding: 0.35rem 0;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  border-top: 3px solid var(--brand-cyan);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 .main-nav .has-sub:hover .sub,
@@ -113,57 +201,86 @@ body {
 .main-nav .sub a,
 .main-nav .sub span {
   display: block;
-  padding: 0.45rem 0.9rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.92rem;
 }
 
 .main-nav .sub a:hover {
-  background: #f1e6d8;
+  background: #f2fafd;
+  color: var(--accent);
 }
 
 .main-nav .sub a.active {
-  font-weight: 700;
+  font-weight: 600;
   color: var(--accent);
 }
 
 .main-nav .disabled {
-  color: #9a9189;
+  color: #9a9a9a;
   cursor: default;
 }
 
 .main-nav .disabled em {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
+  font-style: normal;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   margin-left: 0.3rem;
 }
 
-.user-box {
+/* ---------------------------------------------------------------- footer */
+.site-footer {
+  margin-top: auto;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+
+.footer-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 1.1rem 1.25rem 1.3rem;
   display: flex;
-  gap: 0.6rem;
+  flex-wrap: wrap;
+  gap: 0.75rem 2rem;
   align-items: center;
-  font-size: 0.9rem;
+  justify-content: space-between;
 }
 
-.user-box a {
-  text-decoration: underline;
+.footer-brand {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
 }
 
-.role-badge {
-  font-size: 0.75rem;
-  padding: 0.1rem 0.45rem;
-  border-radius: 999px;
-  background: #efe7dc;
-  border: 1px solid var(--border);
+.footer-brand .wordmark-title {
+  font-size: 1.2rem;
 }
 
+.footer-brand .wordmark-sub {
+  font-size: 0.62rem;
+  padding-left: 0.6rem;
+}
+
+.footer-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* ---------------------------------------------------------------- page */
 .content {
-  max-width: 1100px;
-  margin: 1.5rem auto;
-  padding: 0 1rem;
+  width: 100%;
+  max-width: 1180px;
+  margin: 1.5rem auto 2rem;
+  padding: 0 1.25rem;
 }
 
 .panel {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 4px;
   padding: 1rem;
 }
 
@@ -252,7 +369,7 @@ select {
 
 .notice {
   margin-top: 0;
-  color: #5a5249;
+  color: #5a5a5a;
   font-style: italic;
 }
 
@@ -353,7 +470,7 @@ select {
 h2 small {
   font-size: 0.85rem;
   font-weight: normal;
-  color: #5a5249;
+  color: #5a5a5a;
 }
 
 .record-nav {
@@ -373,7 +490,7 @@ h2 small {
 
 .record-form fieldset {
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 0.75rem 1rem 1rem;
   margin: 0;
   display: grid;
@@ -424,8 +541,8 @@ input[readonly],
 input:disabled,
 textarea:disabled,
 select:disabled {
-  background: #f6f2ec;
-  color: #3a332c;
+  background: #f4f5f6;
+  color: #303030;
 }
 
 .has-error input,
@@ -440,7 +557,7 @@ select:disabled {
 
 .hint,
 .meta {
-  color: #5a5249;
+  color: #5a5a5a;
   font-size: 0.85rem;
 }
 
@@ -481,7 +598,7 @@ select:disabled {
   margin: 0 0.15rem 0.15rem 0;
   border-radius: 999px;
   border: 1px solid var(--border);
-  background: #f6f2ec;
+  background: #f4f5f6;
 }
 
 .pill-current {
@@ -540,7 +657,7 @@ table.compact td {
 
 .report-sub {
   margin: 0 0 0.75rem;
-  color: #5a5249;
+  color: #5a5a5a;
 }
 
 .report-table th,
@@ -550,7 +667,7 @@ table.compact td {
 }
 
 .report-table .group-head td {
-  background: #f6f2ec;
+  background: #f4f5f6;
   font-weight: 700;
 }
 
@@ -562,7 +679,42 @@ table.compact td {
 
 .report-table.grid td,
 .report-table.grid th {
-  border: 1px solid #b9b0a4;
+  border: 1px solid #c8c8c8;
+}
+
+/* Advanced search */
+.search-help {
+  margin-bottom: 0.75rem;
+}
+
+.search-help summary {
+  cursor: pointer;
+  color: var(--accent);
+}
+
+.search-form {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.search-mode {
+  align-items: center;
+}
+
+.search-right {
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem 1rem;
+}
+
+.search-form label span {
+  font-weight: 600;
 }
 
 .list-form {
@@ -584,8 +736,8 @@ table.compact td {
 }
 
 .callout {
-  background: #fff8e6;
-  border: 1px solid #ecd9a6;
+  background: #f2fafd;
+  border: 1px solid #bfe7f5;
   border-radius: 6px;
   padding: 0.6rem 0.8rem;
   font-size: 0.9rem;
@@ -656,6 +808,7 @@ table.compact td {
   .filters-3,
   .details,
   .two-col,
+  .grid-2,
   .grid-3 {
     grid-template-columns: 1fr;
   }

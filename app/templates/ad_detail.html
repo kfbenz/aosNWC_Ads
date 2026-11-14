@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% macro fmt_date(d) -%}
+  {{ d.strftime('%m/%d/%Y') if d else '' }}
+{%- endmacro %}
+
+{% block content %}
+  <p><a href="{{ request.referrer if request.referrer and '/ads/' not in request.referrer else url_for('main.index') }}">&laquo; Back to ads</a></p>
+
+  <section class="panel">
+    <h2>Ad #{{ ad.id }}</h2>
+
+    <dl class="details">
+      <dt>Run date</dt><dd>{{ fmt_date(ad.date_run) }}</dd>
+      <dt>Date sold</dt><dd>{{ fmt_date(ad.date_sold) }}</dd>
+      <dt>Description</dt><dd>{{ ad.description or '' }}</dd>
+      <dt>Size</dt><dd>{{ ad.size_raw or '' }}</dd>
+      <dt>Section</dt><dd>{{ ad.section_raw or '' }}</dd>
+      <dt>Page</dt><dd>{{ ad.ad_page or '' }}</dd>
+      <dt>Run #</dt><dd>{{ ad.run_code or '' }}</dd>
+      <dt>Amount</dt><dd>{{ '${:,.2f}'.format(ad.amount) if ad.amount is not none else '' }}</dd>
+      <dt>Commission</dt><dd>{{ '{:g}%'.format(ad.commission_percent * 100) if ad.commission_percent is not none else '' }}</dd>
+      <dt>Sales rep</dt><dd>{{ ad.sales_rep_raw or '' }}</dd>
+      <dt>Authorized by</dt><dd>{{ ad.authorized_by or '' }}</dd>
+      <dt>Bill #</dt><dd>{{ ad.bill_number or '' }}</dd>
+      <dt>Billed</dt><dd>{{ ad.billed_raw or '' }}</dd>
+      <dt>Notes</dt><dd class="pre">{{ ad.ad_notes or '' }}</dd>
+    </dl>
+  </section>
+
+  <section class="panel">
+    <h2>Advertiser</h2>
+    {% if ad.account %}
+      {% set a = ad.account %}
+      <dl class="details">
+        <dt>Account #</dt><dd>{{ a.account_number }}</dd>
+        <dt>Advertiser</dt><dd>{{ a.advertiser or '' }}</dd>
+        <dt>Contact</dt><dd>{{ a.contact_name or '' }}</dd>
+        <dt>Address</dt>
+        <dd>
+          {{ a.address1 or '' }}{% if a.address2 %}<br>{{ a.address2 }}{% endif %}
+          {% if a.city or a.state_code or a.postal_code %}<br>{{ a.city or '' }}{{ ', ' if a.city and a.state_code }}{{ a.state_code or '' }} {{ a.postal_code or '' }}{% endif %}
+        </dd>
+        <dt>Phone</dt><dd>{{ a.phone or '' }}</dd>
+        <dt>Email</dt><dd>{% if a.email %}<a href="mailto:{{ a.email }}">{{ a.email }}</a>{% endif %}</dd>
+        <dt>Category</dt><dd>{{ a.category or '' }}</dd>
+      </dl>
+    {% else %}
+      <p>
+        <span class="tag">orphan</span>
+        {% if ad.legacy_account_number %}
+          Account number <strong>{{ ad.legacy_account_number }}</strong> does not exist in the Access contacts table.
+        {% else %}
+          This ad has no account number in Access.
+        {% endif %}
+      </p>
+    {% endif %}
+  </section>
+{% endblock %}

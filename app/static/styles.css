@@ -118,6 +118,89 @@ textarea {
   align-items: center;
 }
 
+select {
+  width: 100%;
+  padding: 0.55rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  font: inherit;
+  background: #ffffff;
+}
+
+.panel + .panel {
+  margin-top: 1rem;
+}
+
+.panel a {
+  color: var(--accent);
+}
+
+.notice {
+  margin-top: 0;
+  color: #5a5249;
+  font-style: italic;
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr auto;
+  gap: 0.8rem;
+  align-items: end;
+  margin-bottom: 1rem;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+  padding-bottom: 0.3rem;
+}
+
+.summary {
+  margin: 0 0 0.8rem;
+}
+
+.num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.tag {
+  display: inline-block;
+  font-size: 0.75rem;
+  padding: 0.05rem 0.4rem;
+  border-radius: 4px;
+  background: #fbecec;
+  color: var(--error);
+}
+
+.pager {
+  display: flex;
+  gap: 1.2rem;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.details {
+  display: grid;
+  grid-template-columns: 10rem 1fr;
+  gap: 0.45rem 1rem;
+  margin: 0;
+}
+
+.details dt {
+  font-weight: 600;
+}
+
+.details dd {
+  margin: 0;
+}
+
+.pre {
+  white-space: pre-wrap;
+}
+
 .flash-list {
   list-style: none;
   padding: 0;
@@ -140,6 +223,15 @@ textarea {
 }
 
 @media (max-width: 800px) {
+  .filters,
+  .details {
+    grid-template-columns: 1fr;
+  }
+
+  .num {
+    text-align: left;
+  }
+
   table,
   thead,
   tbody,

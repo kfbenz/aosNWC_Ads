@@ -1,41 +1,100 @@
 {% extends 'base.html' %}
 
+{% macro fmt_date(d) -%}
+  {{ d.strftime('%m/%d/%Y') if d else '' }}
+{%- endmacro %}
+
 {% block content %}
   <section class="panel">
     <h2>Ads</h2>
+    <p class="notice">Read-only view of data imported from Access. Make changes in Access until cutover.</p>
 
-    {% if ads %}
+    <form method="get" class="filters">
+      <label>
+        Search
+        <input name="q" value="{{ filters.q }}" placeholder="Advertiser, description, account #, bill #">
+      </label>
+      <label>
+        Sales rep
+        <select name="rep">
+          <option value="">All</option>
+          {% for r in reps %}
+            <option value="{{ r }}" {{ 'selected' if filters.rep.upper() == r }}>{{ r }}</option>
+          {% endfor %}
+          <option value="(none)" {{ 'selected' if filters.rep == '(none)' }}>(none)</option>
+        </select>
+      </label>
+      <label>
+        Run date from
+        <input type="date" name="from" value="{{ filters.from }}">
+      </label>
+      <label>
+        Run date to
+        <input type="date" name="to" value="{{ filters.to }}">
+      </label>
+      <div class="filter-actions">
+        <button type="submit">Filter</button>
+        <a href="{{ url_for('main.index') }}">Clear</a>
+      </div>
+    </form>
+
+    <p class="summary">
+      <strong>{{ '{:,}'.format(total_count) }}</strong> ads,
+      total <strong>${{ '{:,.2f}'.format(total_amount) }}</strong>
+    </p>
+
+    {% if pagination.items %}
       <table>
         <thead>
           <tr>
             <th>Run Date</th>
-            <th>Title</th>
-            <th>Customer</th>
-            <th>Type</th>
-            <th>Notes</th>
-            <th>Actions</th>
+            <th>Advertiser</th>
+            <th>Description</th>
+            <th>Size</th>
+            <th>Section</th>
+            <th class="num">Amount</th>
+            <th>Rep</th>
+            <th>Billed</th>
           </tr>
         </thead>
         <tbody>
-          {% for ad in ads %}
+          {% for ad in pagination.items %}
             <tr>
-              <td>{{ ad.run_date or '' }}</td>
-              <td>{{ ad.title }}</td>
-              <td>{{ ad.customer }}</td>
-              <td>{{ ad.ad_type }}</td>
-              <td>{{ ad.notes or '' }}</td>
-              <td class="actions">
-                <a href="{{ url_for('main.edit_ad', ad_id=ad.id) }}">Edit</a>
-                <form method="post" action="{{ url_for('main.delete_ad', ad_id=ad.id) }}" onsubmit="return confirm('Delete this ad?');">
-                  <button type="submit">Delete</button>
-                </form>
+              <td>{{ fmt_date(ad.date_run) }}</td>
+              <td>
+                <a href="{{ url_for('main.ad_detail', ad_id=ad.id) }}">
+                  {%- if ad.account -%}
+                    {{ ad.account.advertiser or ad.account.account_number }}
+                  {%- else -%}
+                    {{ ad.legacy_account_number or '(no account)' }}
+                  {%- endif -%}
+                </a>
+                {% if not ad.account %}<span class="tag">orphan</span>{% endif %}
               </td>
+              <td>{{ ad.description or '' }}</td>
+              <td>{{ ad.size_raw or '' }}</td>
+              <td>{{ ad.section_raw or '' }}</td>
+              <td class="num">{{ '${:,.2f}'.format(ad.amount) if ad.amount is not none else '' }}</td>
+              <td>{{ ad.sales_rep_raw or '' }}</td>
+              <td>{{ ad.billed_raw or '' }}</td>
             </tr>
           {% endfor %}
         </tbody>
       </table>
+
+      {% if pagination.pages > 1 %}
+        <nav class="pager">
+          {% if pagination.has_prev %}
+            <a href="{{ url_for('main.index', page=pagination.prev_num, **filter_args) }}">&laquo; Previous</a>
+          {% endif %}
+          <span>Page {{ pagination.page }} of {{ pagination.pages }}</span>
+          {% if pagination.has_next %}
+            <a href="{{ url_for('main.index', page=pagination.next_num, **filter_args) }}">Next &raquo;</a>
+          {% endif %}
+        </nav>
+      {% endif %}
     {% else %}
-      <p>No ads yet. Add your first entry.</p>
+      <p>No ads match these filters.</p>
     {% endif %}
   </section>
 {% endblock %}

@@ -11,7 +11,8 @@ main_bp = Blueprint("main", __name__)
 
 @main_bp.get("/")
 def index():
-    ads = Ad.query.order_by(Ad.run_date.desc().nullslast(), Ad.id.desc()).all()
+    # MariaDB does not support NULLS LAST; a descending sort already places NULLs last.
+    ads = Ad.query.order_by(Ad.run_date.desc(), Ad.id.desc()).all()
     return render_template("index.html", ads=ads)
 
 

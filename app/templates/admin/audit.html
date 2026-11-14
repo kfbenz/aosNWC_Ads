@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block title %}Audit log{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    <h2>Audit log</h2>
+
+    <form method="get" class="filters filters-3">
+      <label>
+        Table
+        <select name="entity">
+          <option value="">All</option>
+          {% for e in entities %}
+            <option value="{{ e }}" {{ 'selected' if filters.entity == e }}>{{ e }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>
+        Record ID
+        <input name="id" value="{{ filters.id }}">
+      </label>
+      <label>
+        User
+        <input name="user" value="{{ filters.user }}">
+      </label>
+      <div class="filter-actions">
+        <button type="submit">Filter</button>
+        <a href="{{ url_for('admin.audit') }}">Clear</a>
+      </div>
+    </form>
+
+    {% if pagination.items %}
+      <table>
+        <thead>
+          <tr>
+            <th>When (UTC)</th>
+            <th>User</th>
+            <th>Action</th>
+            <th>Record</th>
+            <th>Changes</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in pagination.items %}
+            <tr>
+              <td class="nowrap">{{ row.occurred_at.strftime('%m/%d/%Y %H:%M') if row.occurred_at else '' }}</td>
+              <td>{{ row.user_name or '' }}</td>
+              <td>{{ row.action }}</td>
+              <td class="nowrap">
+                {% if row.entity == 'ad_placements' and row.action != 'delete' %}
+                  <a href="{{ url_for('main.ad_detail', ad_id=row.entity_id) }}">{{ row.entity }} #{{ row.entity_id }}</a>
+                {% else %}
+                  {{ row.entity }} #{{ row.entity_id }}
+                {% endif %}
+              </td>
+              <td>
+                <ul class="changes">
+                  {% for field, value in row.changes_dict.items() %}
+                    <li>
+                      <strong>{{ field }}</strong>:
+                      {% if row.action == 'update' %}
+                        <span class="old">{{ value[0] if value[0] is not none else '(blank)' }}</span>
+                        &rarr; {{ value[1] if value[1] is not none else '(blank)' }}
+                      {% else %}
+                        {{ value }}
+                      {% endif %}
+                    </li>
+                  {% endfor %}
+                </ul>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      {% if pagination.pages > 1 %}
+        <nav class="pager">
+          {% if pagination.has_prev %}
+            <a href="{{ url_for('admin.audit', page=pagination.prev_num, **filter_args) }}">&laquo; Previous</a>
+          {% endif %}
+          <span>Page {{ pagination.page }} of {{ pagination.pages }}</span>
+          {% if pagination.has_next %}
+            <a href="{{ url_for('admin.audit', page=pagination.next_num, **filter_args) }}">Next &raquo;</a>
+          {% endif %}
+        </nav>
+      {% endif %}
+    {% else %}
+      <p>No changes recorded{{ ' for these filters' if filter_args }}.</p>
+    {% endif %}
+  </section>
+{% endblock %}

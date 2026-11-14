@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}No access{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    <h2>No access yet</h2>
+    <p>You are signed in as <strong>{{ g.user.username }}</strong>, but you have not been given a role in NWC Ads.</p>
+    <p>Ask the NWC Ads administrator to assign you the Viewer, Editor, or Admin role. After that, sign out and sign in again.</p>
+    <p><a href="{{ url_for('auth.logout') }}">Sign out</a></p>
+  </section>
+{% endblock %}

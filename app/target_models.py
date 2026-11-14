@@ -3,6 +3,7 @@ from app.extensions import db
 
 class Account(db.Model):
     __tablename__ = "accounts"
+    __audited__ = True
 
     account_number = db.Column(db.String(6), primary_key=True)
     advertiser = db.Column(db.String(255), nullable=True)
@@ -31,12 +32,15 @@ class Account(db.Model):
         server_default=db.func.now(),
         onupdate=db.func.now(),
     )
+    created_by = db.Column(db.String(255), nullable=True)
+    updated_by = db.Column(db.String(255), nullable=True)
 
     ad_placements = db.relationship("AdPlacement", back_populates="account")
 
 
 class AdPlacement(db.Model):
     __tablename__ = "ad_placements"
+    __audited__ = True
 
     id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
     legacy_account_number = db.Column(db.String(6), nullable=True)
@@ -63,6 +67,8 @@ class AdPlacement(db.Model):
         server_default=db.func.now(),
         onupdate=db.func.now(),
     )
+    created_by = db.Column(db.String(255), nullable=True)
+    updated_by = db.Column(db.String(255), nullable=True)
 
     account = db.relationship("Account", back_populates="ad_placements")
 

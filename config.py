@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 from urllib.parse import quote_plus
 
 from dotenv import load_dotenv
@@ -6,9 +7,18 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+DEFAULT_SECRET_KEY = "dev-secret-key"
+
+
+def _env_bool(name: str, default: bool) -> bool:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.strip().lower() in ("1", "true", "yes", "on")
+
 
 class Config:
-    SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key")
+    SECRET_KEY = os.getenv("SECRET_KEY", DEFAULT_SECRET_KEY)
 
     _database_url = os.getenv("DATABASE_URL")
     if _database_url:
@@ -24,3 +34,27 @@ class Config:
         )
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ENGINE_OPTIONS = {"pool_pre_ping": True, "pool_recycle": 3600}
+
+    # Authentication
+    # AUTH_MODE=entra : Microsoft Entra ID sign-in (production).
+    # AUTH_MODE=dev   : no sign-in; every request runs as a local user with DEV_ROLE.
+    #                   Use only on a developer machine or behind an IP allow list.
+    AUTH_MODE = os.getenv("AUTH_MODE", "entra").strip().lower()
+    DEV_ROLE = os.getenv("DEV_ROLE", "Admin").strip()
+    DEV_USER_NAME = os.getenv("DEV_USER_NAME", "Local Developer").strip()
+
+    ENTRA_TENANT_ID = os.getenv("ENTRA_TENANT_ID", "").strip()
+    ENTRA_CLIENT_ID = os.getenv("ENTRA_CLIENT_ID", "").strip()
+    ENTRA_CLIENT_SECRET = os.getenv("ENTRA_CLIENT_SECRET", "").strip()
+    # Optional: set explicitly if the app cannot work out its public URL behind the proxy.
+    ENTRA_REDIRECT_URI = os.getenv("ENTRA_REDIRECT_URI", "").strip()
+
+    # Sessions
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = "Lax"
+    SESSION_COOKIE_SECURE = _env_bool("SESSION_COOKIE_SECURE", AUTH_MODE != "dev")
+    PERMANENT_SESSION_LIFETIME = timedelta(hours=8)
+
+    # Number of reverse proxies in front of the app (Nginx = 1).
+    PROXY_COUNT = int(os.getenv("PROXY_COUNT", "1"))

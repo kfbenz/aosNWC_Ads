@@ -139,6 +139,35 @@ Before reloading:
 - Replace server_name example.com with your real domain.
 - Configure TLS using certbot or your existing certificate process.
 
+## Sign-in (Microsoft Entra ID) and roles
+
+Set `AUTH_MODE` in `.env`:
+
+- `entra`: production. Staff sign in with Microsoft 365. Requires `ENTRA_TENANT_ID`, `ENTRA_CLIENT_ID`, `ENTRA_CLIENT_SECRET`, and a non-default `SECRET_KEY`; the app refuses to start without them.
+- `dev`: no sign-in; every request runs as `DEV_ROLE` (default Admin). Use only on a developer machine or behind the Nginx IP allow list. A yellow banner is shown on every page.
+
+Roles come from the Entra app roles `NWCAds.Viewer`, `NWCAds.Editor`, and `NWCAds.Admin`. Every page requires at least Viewer; protect editing views with `@require_role("Editor")` from `app/auth.py`.
+
+Entra app registration settings:
+- Redirect URI: `https://<host>/auth/callback`
+- Front-channel logout URL: `https://<host>/auth/frontchannel-logout`
+
+Unauthenticated health check: `GET /healthz` returns `ok`.
+
+## Audit trail
+
+Models with `__audited__ = True` (currently `Account` and `AdPlacement`) write one `audit_log` row per insert, update, or delete, in the same transaction, and stamp `created_by` / `updated_by`. Admins can browse it at Admin > Audit log.
+
+## Database migrations
+
+Schema changes go through Flask-Migrate (`migrations/`). On the server:
+
+```bash
+.venv/bin/flask --app run.py db upgrade
+```
+
+The baseline migration (`0001_baseline`) runs `sql/001_target_schema.sql` with `CREATE TABLE IF NOT EXISTS`, so it is safe on a database that was already built and imported. For new changes, write a new revision in `migrations/versions/`.
+
 ## Moving from Access
 
 1. List your Access tables, fields, and relationships.

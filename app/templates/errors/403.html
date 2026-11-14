@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Not allowed{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    <h2>Not allowed</h2>
+    <p>Your role ({{ g.user.role if g.user and g.user.role else 'none' }}) does not have access to this page.</p>
+    <p>If you need access, ask the NWC Ads administrator to change your role.</p>
+    <p><a href="{{ url_for('main.index') }}">Back to ads</a></p>
+  </section>
+{% endblock %}

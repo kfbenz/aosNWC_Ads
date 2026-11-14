@@ -87,6 +87,13 @@ def index():
     )
 
 
+@main_bp.get("/healthz")
+def healthz():
+    """Unauthenticated liveness check for curl and monitoring."""
+    db.session.execute(select(1))
+    return "ok", 200, {"Content-Type": "text/plain"}
+
+
 @main_bp.get("/ads/<int:ad_id>")
 def ad_detail(ad_id: int):
     ad = db.get_or_404(AdPlacement, ad_id)

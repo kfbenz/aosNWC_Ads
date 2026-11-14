@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% block title %}Ads{% endblock %}
 
 {% macro fmt_date(d) -%}
   {{ d.strftime('%m/%d/%Y') if d else '' }}

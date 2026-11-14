@@ -9,7 +9,17 @@
   <p><a href="{{ request.referrer if request.referrer and '/ads/' not in request.referrer else url_for('main.index') }}">&laquo; Back to ads</a></p>
 
   <section class="panel">
-    <h2>Ad #{{ ad.id }}</h2>
+    <div class="panel-head">
+      <h2>Ad #{{ ad.id }}</h2>
+      <div class="actions">
+        {% if ad.account %}
+          <a href="{{ url_for('accounts.detail', account_number=ad.account.account_number) }}">Open account</a>
+        {% endif %}
+        {% if g.user.can('Editor') %}
+          <a class="button" href="{{ url_for('main.edit_ad', ad_id=ad.id) }}">Edit ad</a>
+        {% endif %}
+      </div>
+    </div>
 
     <dl class="details">
       <dt>Run date</dt><dd>{{ fmt_date(ad.date_run) }}</dd>
@@ -34,7 +44,7 @@
     {% if ad.account %}
       {% set a = ad.account %}
       <dl class="details">
-        <dt>Account #</dt><dd>{{ a.account_number }}</dd>
+        <dt>Account #</dt><dd><a href="{{ url_for('accounts.detail', account_number=a.account_number) }}">{{ a.account_number }}</a></dd>
         <dt>Advertiser</dt><dd>{{ a.advertiser or '' }}</dd>
         <dt>Contact</dt><dd>{{ a.contact_name or '' }}</dd>
         <dt>Address</dt>

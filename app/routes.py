@@ -1,15 +1,20 @@
 from datetime import date, datetime
+from decimal import Decimal
 
-from flask import Blueprint, render_template, request
+from flask import Blueprint, flash, redirect, render_template, request, url_for
 from sqlalchemy import func, or_, select
 
+from app.auth import require_role
 from app.extensions import db
+from app.forms import AdForm
+from app.locking import row_version as _version
 from app.target_models import Account, AdPlacement
 
 
 main_bp = Blueprint("main", __name__)
 
 PER_PAGE = 50
+SUGGESTION_LIMIT = 150
 
 
 @main_bp.get("/")
@@ -98,6 +103,109 @@ def healthz():
 def ad_detail(ad_id: int):
     ad = db.get_or_404(AdPlacement, ad_id)
     return render_template("ad_detail.html", ad=ad)
+
+
+@main_bp.route("/accounts/<account_number>/ads/new", methods=["GET", "POST"])
+@require_role("Editor")
+def new_ad(account_number: str):
+    account = db.get_or_404(Account, account_number)
+    form = AdForm()
+
+    if request.method == "GET":
+        # Start from the account's most recent ad, as staff usually repeat its terms.
+        last = db.session.scalars(
+            select(AdPlacement)
+            .where(AdPlacement.account_number == account.account_number)
+            .order_by(AdPlacement.date_run.desc(), AdPlacement.id.desc())
+            .limit(1)
+        ).first()
+        if last is not None:
+            form.commission_pct.data = _fraction_to_pct(last.commission_percent)
+            form.sales_rep_raw.data = last.sales_rep_raw
+            form.authorized_by.data = last.authorized_by
+        form.date_sold.data = date.today()
+
+    if form.validate_on_submit():
+        ad = AdPlacement(account_number=account.account_number, legacy_account_number=account.account_number)
+        _apply_ad_form(form, ad)
+        db.session.add(ad)
+        db.session.commit()
+        flash("Ad added.", "success")
+        return redirect(url_for("accounts.detail", account_number=account.account_number))
+
+    return render_template("ads/form.html", form=form, ad=None, account=account, suggestions=_suggestions())
+
+
+@main_bp.route("/ads/<int:ad_id>/edit", methods=["GET", "POST"])
+@require_role("Editor")
+def edit_ad(ad_id: int):
+    ad = db.get_or_404(AdPlacement, ad_id)
+    form = AdForm(obj=ad)
+
+    if request.method == "GET":
+        form.commission_pct.data = _fraction_to_pct(ad.commission_percent)
+        form.version.data = _version(ad)
+
+    if form.validate_on_submit():
+        if form.version.data != _version(ad):
+            flash(
+                "Someone else saved this ad while you were editing it. "
+                "Their changes are shown below; re-enter yours and save again.",
+                "error",
+            )
+            return redirect(url_for("main.edit_ad", ad_id=ad.id))
+
+        _apply_ad_form(form, ad)
+        db.session.commit()
+        flash("Ad saved.", "success")
+        if ad.account_number:
+            return redirect(url_for("accounts.detail", account_number=ad.account_number))
+        return redirect(url_for("main.ad_detail", ad_id=ad.id))
+
+    return render_template("ads/form.html", form=form, ad=ad, account=ad.account, suggestions=_suggestions())
+
+
+@main_bp.post("/ads/<int:ad_id>/delete")
+@require_role("Admin")
+def delete_ad(ad_id: int):
+    ad = db.get_or_404(AdPlacement, ad_id)
+    account_number = ad.account_number
+    db.session.delete(ad)
+    db.session.commit()
+    flash(f"Ad #{ad_id} deleted.", "success")
+    if account_number:
+        return redirect(url_for("accounts.detail", account_number=account_number))
+    return redirect(url_for("main.index"))
+
+
+def _fraction_to_pct(value):
+    return None if value is None else (Decimal(value) * 100).quantize(Decimal("0.01"))
+
+
+def _apply_ad_form(form: AdForm, ad: AdPlacement) -> None:
+    for name in AdForm.MODEL_FIELDS:
+        setattr(ad, name, getattr(form, name).data)
+    pct = form.commission_pct.data
+    ad.commission_percent = None if pct is None else (Decimal(pct) / 100).quantize(Decimal("0.0001"))
+
+
+def _suggestions() -> dict:
+    """Values already in use, most common first, offered as type-ahead suggestions."""
+
+    def common(column):
+        return db.session.scalars(
+            select(column)
+            .where(column.is_not(None))
+            .group_by(column)
+            .order_by(func.count().desc(), column)
+            .limit(SUGGESTION_LIMIT)
+        ).all()
+
+    return {
+        "sales": common(func.upper(AdPlacement.sales_rep_raw)),
+        "size": common(AdPlacement.size_raw),
+        "section": common(AdPlacement.section_raw),
+    }
 
 
 def _parse_date(value: str | None) -> date | None:

@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% import '_form.html' as f %}
+{% block title %}Accounts{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Accounts</h2>
+      {% if g.user.can('Editor') %}
+        <a class="button" href="{{ url_for('accounts.new') }}">New account</a>
+      {% endif %}
+    </div>
+
+    <form method="get" class="filters filters-3">
+      <label>
+        Search
+        <input name="q" value="{{ filters.q }}" placeholder="Name, account #, contact, city, e-mail, phone, category">
+      </label>
+      <label>
+        Show
+        <select name="flag">
+          <option value="">All accounts</option>
+          <option value="current" {{ 'selected' if filters.flag == 'current' }}>Current advertisers</option>
+          <option value="past" {{ 'selected' if filters.flag == 'past' }}>Past advertisers</option>
+          <option value="prospect" {{ 'selected' if filters.flag == 'prospect' }}>Prospects</option>
+          <option value="email" {{ 'selected' if filters.flag == 'email' }}>E-mail list</option>
+        </select>
+      </label>
+      <label>
+        Sort by
+        <select name="sort">
+          <option value="name" {{ 'selected' if filters.sort == 'name' }}>Advertiser name</option>
+          <option value="number" {{ 'selected' if filters.sort == 'number' }}>Account # (newest first)</option>
+          <option value="recent" {{ 'selected' if filters.sort == 'recent' }}>Most recent ad</option>
+        </select>
+      </label>
+      <div class="filter-actions">
+        <button type="submit">Filter</button>
+        <a href="{{ url_for('accounts.index') }}">Clear</a>
+      </div>
+    </form>
+
+    <p class="summary"><strong>{{ '{:,}'.format(total) }}</strong> accounts</p>
+
+    {% if rows %}
+      <table>
+        <thead>
+          <tr>
+            <th>Account</th>
+            <th>Advertiser</th>
+            <th>Contact</th>
+            <th>City</th>
+            <th>Phone</th>
+            <th>Status</th>
+            <th class="num">Ads</th>
+            <th>Last run</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for account, ad_count, last_run in rows %}
+            <tr>
+              <td class="nowrap"><a href="{{ url_for('accounts.detail', account_number=account.account_number) }}">{{ account.account_number }}</a></td>
+              <td><a href="{{ url_for('accounts.detail', account_number=account.account_number) }}">{{ account.advertiser or '(no name)' }}</a></td>
+              <td>{{ account.contact_name or '' }}</td>
+              <td>{{ account.city or '' }}</td>
+              <td class="nowrap">{{ account.phone or '' }}</td>
+              <td>
+                {% if account.is_current_advertiser %}<span class="pill pill-current">Current</span>{% endif %}
+                {% if account.is_past_advertiser %}<span class="pill">Past</span>{% endif %}
+                {% if account.is_prospect %}<span class="pill">Prospect</span>{% endif %}
+                {% if account.is_email_list %}<span class="pill">E-mail</span>{% endif %}
+              </td>
+              <td class="num">{{ ad_count }}</td>
+              <td class="nowrap">{{ f.fmt_date(last_run) }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      {% if pages > 1 %}
+        <nav class="pager">
+          {% if page > 1 %}
+            <a href="{{ url_for('accounts.index', page=page - 1, **filter_args) }}">&laquo; Previous</a>
+          {% endif %}
+          <span>Page {{ page }} of {{ pages }}</span>
+          {% if page < pages %}
+            <a href="{{ url_for('accounts.index', page=page + 1, **filter_args) }}">Next &raquo;</a>
+          {% endif %}
+        </nav>
+      {% endif %}
+    {% else %}
+      <p>No accounts match these filters.</p>
+    {% endif %}
+  </section>
+{% endblock %}

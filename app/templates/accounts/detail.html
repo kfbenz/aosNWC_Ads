@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% import '_form.html' as f %}
+{% block title %}{{ account.advertiser if account else 'New account' }}{% endblock %}
+
+{% block content %}
+  <div class="record-nav">
+    <a href="{{ url_for('accounts.index') }}">&laquo; All accounts</a>
+    {% if account %}
+      <span class="spacer"></span>
+      {% if nav.prev %}<a href="{{ url_for('accounts.detail', account_number=nav.prev) }}">&lsaquo; Previous ({{ nav.prev }})</a>{% endif %}
+      {% if nav.next %}<a href="{{ url_for('accounts.detail', account_number=nav.next) }}">Next ({{ nav.next }}) &rsaquo;</a>{% endif %}
+    {% endif %}
+  </div>
+
+  <section class="panel">
+    <h2>{{ 'View and Edit Advertiser' if account else 'New Advertiser' }}{% if account %}: {{ account.advertiser or account.account_number }}{% endif %}</h2>
+
+    <form method="post" class="record-form" novalidate>
+      {{ form.csrf_token }}
+      {{ form.version }}
+
+      <div class="two-col">
+        <fieldset>
+          <legend>Contact</legend>
+          {% for name in form.LEFT_FIELDS %}
+            {{ f.field(form[name], editable=can_edit) }}
+          {% endfor %}
+        </fieldset>
+
+        <fieldset>
+          <legend>Client Information</legend>
+          {% for name in form.RIGHT_FIELDS %}
+            {{ f.field(form[name], editable=can_edit) }}
+          {% endfor %}
+          <div class="checks">
+            {% for name in form.FLAG_FIELDS %}
+              {{ f.field(form[name], editable=can_edit) }}
+            {% endfor %}
+          </div>
+        </fieldset>
+      </div>
+
+      {% if can_edit %}
+        <div class="form-actions">
+          <button type="submit">{{ 'Save' if account else 'Create account' }}</button>
+          <a href="{{ url_for('accounts.detail', account_number=account.account_number) if account else url_for('accounts.index') }}">Cancel</a>
+          {% if account %}
+            <span class="meta">
+              {% if account.updated_by %}Last changed by {{ account.updated_by }}{% endif %}
+              {% if account.updated_at %} on {{ account.updated_at.strftime('%m/%d/%Y %H:%M') }}{% endif %}
+            </span>
+          {% endif %}
+        </div>
+      {% endif %}
+    </form>
+
+    {% if account and g.user.can('Admin') %}
+      <form method="post" action="{{ url_for('accounts.delete', account_number=account.account_number) }}"
+            class="danger-zone" onsubmit="return confirm('Delete account {{ account.account_number }}? This cannot be undone.');">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="button-danger" {% if ads %}disabled title="Accounts with ads cannot be deleted"{% endif %}>Delete account</button>
+      </form>
+    {% endif %}
+  </section>
+
+  {% if account %}
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Advertising History <small>({{ ads|length }} ads, {{ f.money(ads|selectattr('amount')|map(attribute='amount')|sum) }})</small></h2>
+        {% if can_edit %}
+          <a class="button" href="{{ url_for('main.new_ad', account_number=account.account_number) }}">Add ad</a>
+        {% endif %}
+      </div>
+
+      {% if ads %}
+        <div class="table-scroll">
+          <table class="compact">
+            <thead>
+              <tr>
+                <th class="num">Comm %</th>
+                <th>Date Sold</th>
+                <th>Date Run</th>
+                <th>Desc</th>
+                <th>Auth By</th>
+                <th>Sales</th>
+                <th>Size</th>
+                <th>Section</th>
+                <th>Page</th>
+                <th>Notes</th>
+                <th>Run #</th>
+                <th>Bill #</th>
+                <th class="num">Amount</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for ad in ads %}
+                <tr>
+                  <td class="num">{{ f.pct(ad.commission_percent) }}</td>
+                  <td class="nowrap">{{ f.fmt_date(ad.date_sold) }}</td>
+                  <td class="nowrap">{{ f.fmt_date(ad.date_run) }}</td>
+                  <td>{{ ad.description or '' }}</td>
+                  <td>{{ ad.authorized_by or '' }}</td>
+                  <td>{{ ad.sales_rep_raw or '' }}</td>
+                  <td>{{ ad.size_raw or '' }}</td>
+                  <td>{{ ad.section_raw or '' }}</td>
+                  <td>{{ ad.ad_page or '' }}</td>
+                  <td>{{ (ad.ad_notes or '')|truncate(40) }}</td>
+                  <td>{{ ad.run_code or '' }}</td>
+                  <td>{{ ad.bill_number or '' }}</td>
+                  <td class="num">{{ f.money(ad.amount) }}</td>
+                  <td class="nowrap">
+                    {% if can_edit %}
+                      <a href="{{ url_for('main.edit_ad', ad_id=ad.id) }}">Edit</a>
+                    {% else %}
+                      <a href="{{ url_for('main.ad_detail', ad_id=ad.id) }}">View</a>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p>No ads for this account yet.</p>
+      {% endif %}
+    </section>
+  {% endif %}
+{% endblock %}

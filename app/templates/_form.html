@@ -1,0 +1,42 @@
+{# Shared form helpers. Import with: {% import '_form.html' as f %} #}
+
+{% macro field(fld, editable=true, list=none, cls='') -%}
+  {%- set attrs = {} -%}
+  {%- if not editable %}{% set _ = attrs.update({'disabled': true}) %}{% endif -%}
+  {%- if list %}{% set _ = attrs.update({'list': list}) %}{% endif -%}
+  {%- if fld.type == 'BooleanField' -%}
+    <label class="check {{ cls }}">
+      {{ fld(**attrs) }} {{ fld.label.text }}
+    </label>
+  {%- else -%}
+    <label class="{{ cls }}{{ ' has-error' if fld.errors }}">
+      <span>{{ fld.label.text }}{% if fld.flags.required %} <abbr title="required">*</abbr>{% endif %}</span>
+      {%- if fld.type == 'TextAreaField' %}
+        {{ fld(rows=4, **attrs) }}
+      {%- else %}
+        {{ fld(**attrs) }}
+      {%- endif %}
+      {%- for err in fld.errors %}
+        <small class="field-error">{{ err }}</small>
+      {%- endfor %}
+    </label>
+  {%- endif -%}
+{%- endmacro %}
+
+{% macro datalist(id, values) -%}
+  <datalist id="{{ id }}">
+    {%- for v in values %}<option value="{{ v }}">{% endfor -%}
+  </datalist>
+{%- endmacro %}
+
+{% macro fmt_date(d) -%}
+  {{ d.strftime('%m/%d/%Y') if d else '' }}
+{%- endmacro %}
+
+{% macro money(v) -%}
+  {{ '${:,.2f}'.format(v) if v is not none else '' }}
+{%- endmacro %}
+
+{% macro pct(v) -%}
+  {{ '{:g}%'.format(v * 100) if v is not none else '' }}
+{%- endmacro %}

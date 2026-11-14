@@ -32,12 +32,14 @@ def create_app(config_object=Config) -> Flask:
 
     init_audit()
 
+    from app.accounts import accounts_bp
     from app.admin import admin_bp
     from app.menu import build_menu
     from app.routes import main_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
+    app.register_blueprint(accounts_bp)
     app.register_blueprint(admin_bp)
 
     @app.context_processor

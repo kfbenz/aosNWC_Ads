@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% import '_form.html' as f %}
+{% block title %}{{ 'Edit ad #' ~ ad.id if ad else 'New ad' }}{% endblock %}
+
+{% block content %}
+  <div class="record-nav">
+    {% if account %}
+      <a href="{{ url_for('accounts.detail', account_number=account.account_number) }}">&laquo; Back to {{ account.advertiser or account.account_number }}</a>
+    {% else %}
+      <a href="{{ url_for('main.index') }}">&laquo; Back to ads</a>
+    {% endif %}
+  </div>
+
+  <section class="panel">
+    <h2>
+      {{ 'Edit ad #' ~ ad.id if ad else 'New ad' }}
+      {% if account %}<small>for {{ account.advertiser or '' }} ({{ account.account_number }})</small>
+      {% elif ad %}<small><span class="tag">orphan</span> account {{ ad.legacy_account_number or '(none)' }}</small>{% endif %}
+    </h2>
+
+    <form method="post" class="record-form" novalidate>
+      {{ form.csrf_token }}
+      {{ form.version }}
+
+      <div class="grid-3">
+        {{ f.field(form.date_sold) }}
+        {{ f.field(form.date_run) }}
+        {{ f.field(form.amount) }}
+
+        {{ f.field(form.commission_pct) }}
+        {{ f.field(form.sales_rep_raw, list='dl-sales') }}
+        {{ f.field(form.authorized_by) }}
+
+        {{ f.field(form.size_raw, list='dl-size') }}
+        {{ f.field(form.section_raw, list='dl-section') }}
+        {{ f.field(form.ad_page) }}
+
+        {{ f.field(form.run_code) }}
+        {{ f.field(form.bill_number) }}
+        <div></div>
+
+        {{ f.field(form.description, cls='span-3') }}
+        {{ f.field(form.ad_notes, cls='span-3') }}
+      </div>
+      <p class="hint">Comm %: enter 10 for 10%. Size, Section, and Sales suggest values already in use; you can still type a new one.</p>
+
+      {{ f.datalist('dl-sales', suggestions.sales) }}
+      {{ f.datalist('dl-size', suggestions.size) }}
+      {{ f.datalist('dl-section', suggestions.section) }}
+
+      <div class="form-actions">
+        <button type="submit">{{ 'Save' if ad else 'Add ad' }}</button>
+        <a href="{{ url_for('accounts.detail', account_number=account.account_number) if account else url_for('main.index') }}">Cancel</a>
+        {% if ad and ad.updated_by %}
+          <span class="meta">Last changed by {{ ad.updated_by }}{% if ad.updated_at %} on {{ ad.updated_at.strftime('%m/%d/%Y %H:%M') }}{% endif %}</span>
+        {% endif %}
+      </div>
+    </form>
+
+    {% if ad and g.user.can('Admin') %}
+      <form method="post" action="{{ url_for('main.delete_ad', ad_id=ad.id) }}" class="danger-zone"
+            onsubmit="return confirm('Delete ad #{{ ad.id }}? This cannot be undone.');">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="button-danger">Delete ad</button>
+      </form>
+    {% endif %}
+  </section>
+{% endblock %}

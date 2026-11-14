@@ -1,3 +1,18 @@
+# Copyright 2026 Archdiocese of Seattle
+# Author: Kevin F Benz
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 """Mailing labels as PDF on Avery 5160 / 8160 sheets (30 per letter page, 1" x 2-5/8").
 
 Print at "Actual size" (100%), not "Fit to page", or the labels will drift.

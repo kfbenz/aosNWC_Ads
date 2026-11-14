@@ -288,3 +288,9 @@ Definition of done for transition:
 - Add search/filtering for ads.
 - Add audit history for edits/deletes.
 - Add data import scripts for Access exports.
+
+## License
+
+Copyright 2026 Archdiocese of Seattle. Author: Kevin F Benz.
+
+Licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE). Each source file carries the standard Apache header; add it to new files as well.

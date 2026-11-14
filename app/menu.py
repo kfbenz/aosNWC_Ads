@@ -50,6 +50,7 @@ MENU = [
             {"label": "Audit log", "endpoint": "admin.audit"},
         ],
     },
+    {"label": "Help", "endpoint": "help.index", "role": "Viewer", "also_prefix": "help."},
 ]
 
 

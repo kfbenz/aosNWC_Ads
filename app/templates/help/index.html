@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Help{% endblock %}
+
+{% block content %}
+  <section class="panel help-home">
+    <h2>Help</h2>
+    <p class="notice">
+      Each page also has a <strong>Help</strong> link at the top right that opens the part of this guide for that page.
+    </p>
+
+    <form method="get" class="help-search" role="search" action="{{ url_for('help.index') }}">
+      <label for="help-q" class="visually-hidden">Search help</label>
+      <input id="help-q" name="q" value="{{ q }}" placeholder="Search help, for example: labels, Comm %, orphan" autofocus>
+      <button type="submit">Search</button>
+      {% if q %}<a href="{{ url_for('help.index') }}">Clear</a>{% endif %}
+    </form>
+
+    {% if results is not none %}
+      <h3 class="help-results-title">
+        {{ results|length }} topic{{ 's' if results|length != 1 }} mention{{ 's' if results|length == 1 }} &ldquo;{{ q }}&rdquo;
+      </h3>
+      {% if results %}
+        <ol class="help-results">
+          {% for r in results %}
+            <li>
+              <a href="{{ url_for('help.topic', slug=r.slug) }}">{{ r.title }}</a>
+              {% for s in r.snippets %}<p class="help-snippet">{{ s }}</p>{% endfor %}
+            </li>
+          {% endfor %}
+        </ol>
+      {% else %}
+        <p>Nothing found. Try a shorter word, or browse the topics below.</p>
+      {% endif %}
+    {% endif %}
+
+    {% for group, items in groups.items() %}
+      <h3 class="help-group">{{ group }}</h3>
+      <ul class="help-cards">
+        {% for t in items %}
+          <li>
+            <a href="{{ url_for('help.topic', slug=t.slug) }}">
+              <strong>{{ t.title }}</strong>
+              <span>{{ t.summary }}</span>
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endfor %}
+  </section>
+{% endblock %}

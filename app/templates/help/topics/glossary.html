@@ -1,0 +1,68 @@
+<h3 id="terms">Terms</h3>
+<dl class="help-terms">
+  <dt>Account number</dt>
+  <dd>The advertiser's six-character number, such as <code>004017</code>. It never changes once the account exists.</dd>
+
+  <dt>Advertiser</dt>
+  <dd>The name of the account: a parish, school, business, organization, or person.</dd>
+
+  <dt>Date Sold</dt>
+  <dd>The date the advertiser bought the ad. The commission report uses it.</dd>
+
+  <dt>Date Run</dt>
+  <dd>The date of the issue in which the ad appears. The publication report, advertiser lists, and exports use it.</dd>
+
+  <dt>Comm %</dt>
+  <dd>The sales commission percentage on an ad. Enter <code>10</code> for 10%. Commission earned is the amount multiplied by this percentage.</dd>
+
+  <dt>Directory Years</dt>
+  <dd>The years in which the advertiser appears in the directory. The mailing labels report reads this field.</dd>
+
+  <dt>Status boxes</dt>
+  <dd>Current Advertiser, Past Advertiser, Prospect, and E-mail List on each account. They are independent of each other.</dd>
+
+  <dt>Lookup list</dt>
+  <dd>The allowed values for an ad's Sales, Size, or Section field. Admins maintain them.</dd>
+
+  <dt>Legacy value</dt>
+  <dd>A value on an older ad that is not on the lookup list. The ad keeps it until someone chooses a value from the list.</dd>
+
+  <dt>Orphan ad</dt>
+  <dd>An ad whose account number does not match any account, usually because of a typing difference in Access. Admins fix these.</dd>
+
+  <dt>Audit log</dt>
+  <dd>The record of every change: who made it, when, and the old and new values.</dd>
+</dl>
+
+<h3 id="faq">Common questions</h3>
+
+<h4>I cannot see a Save button or an Add ad button.</h4>
+<p>Your role is Viewer, which is read-only. If your work requires changes, ask IT for the Editor role.</p>
+
+<h4>The site says "No access yet".</h4>
+<p>You signed in, but your account has no NWC Ads role. Ask IT to assign one.</p>
+
+<h4>The site says "Someone else saved this ... while you were editing it".</h4>
+<p>Another person saved the same record first. The page now shows their version. Enter your changes again and save.</p>
+
+<h4>The Sales, Size, or Section dropdown does not have the value I need.</h4>
+<p>Ask an Admin to add it to the lookup list. Until then, an older ad can keep its current value.</p>
+
+<h4>I entered 0.10 in Comm % and the ad shows 0.1%.</h4>
+<p>Comm % takes a percentage. Edit the ad and enter <code>10</code> for 10%.</p>
+
+<h4>My labels do not line up with the stickers.</h4>
+<p>Print at <strong>Actual size</strong> (100%), not "Fit to page", and use Avery 5160 or 8160 sheets.
+  See <a href="{{ url_for('help.topic', slug='reports', _anchor='printing-labels') }}">Printing labels</a>.</p>
+
+<h4>A search finds fewer accounts than I expected.</h4>
+<p>
+  In AND mode, every field must match, and ad fields must match the same ad. Switch to OR, or fill in fewer fields.
+  Also check the status boxes, which always narrow the results.
+</p>
+
+<h4>I made a mistake. Can it be undone?</h4>
+<p>
+  Edit the record again and correct it. If you deleted something by mistake, or cannot tell what changed,
+  ask an Admin: the audit log shows the earlier values.
+</p>

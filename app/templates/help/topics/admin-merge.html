@@ -1,0 +1,46 @@
+<p class="lead">
+  Over the years, Access collected many spellings of the same value: <code>KH</code>, <code>Kh</code>, and <code>kh</code>
+  for one sales rep, or <code>1/4 pg</code>, <code>1/4 page</code>, and <code>quarter</code> for one size.
+  Merge spellings changes them all to one value, so reports and searches group them together.
+</p>
+
+<h3 id="steps">Merging</h3>
+<ol>
+  <li>Open <strong>Admin &rsaquo; Normalization map</strong> (the page is titled "Merge spellings") and choose the field tab: Sales, Size, Section, or Billed.</li>
+  <li>Use <strong>Find</strong> to narrow the list, for example <code>1/4</code>. Each value shows how many ads use it.</li>
+  <li>Tick every spelling that means the same thing.</li>
+  <li>In <strong>Merge ticked values into</strong>, enter the value to keep. It can be one of the ticked spellings or a new one.
+      The box suggests the lookup list's entries and the values already in use.</li>
+  <li>Choose <strong>Preview merge</strong>.</li>
+</ol>
+
+<h3 id="preview">The preview</h3>
+<p>
+  The preview shows exactly how many ads will change, broken down by current spelling. Nothing has changed yet.
+</p>
+<ul>
+  <li>If the value to keep is not on the lookup list, the preview offers to <strong>add it to the list</strong>. Leave that ticked in most cases.</li>
+  <li>If the list already has the value with different capitals, the preview says so. Go back and use the list's spelling,
+      so that the ads match the list exactly.</li>
+</ul>
+<p>Choose <strong>Merge</strong> to make the change, or <strong>Cancel</strong> to go back.</p>
+
+<h3 id="after">What the merge records</h3>
+<ul>
+  <li>The system changes each affected ad and records each change in the audit log, with the old and new value.</li>
+  <li>It saves the decision itself (old value, new value, who approved it, and when) in the normalization map.
+      The <strong>Recent merges</strong> list at the bottom of the page shows these decisions.</li>
+</ul>
+
+<p class="callout">
+  A merge changes live ads, and it has no single "undo" button. To reverse a merge, merge the values back by hand,
+  using the audit log to see which ads changed. Confirm the values with the business owner before large merges,
+  and make sure a recent database backup exists.
+</p>
+
+<h3 id="tips">Tips</h3>
+<ul>
+  <li>Start with Sales, which has few values, to learn how the page works.</li>
+  <li>Size has the most spellings. Work through it in small groups with Find, for example <code>1/4</code>, then <code>1/2</code>, then <code>col</code>.</li>
+  <li>Capitals matter on this page: <code>KH</code> and <code>kh</code> appear as separate values so that you can merge them.</li>
+</ul>

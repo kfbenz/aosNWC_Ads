@@ -30,6 +30,11 @@
           <div class="user-box">
             <span class="user-name">{{ g.user.name }}</span>
             <span class="role-badge">{{ g.user.role or 'No role' }}</span>
+            {% if g.user.role %}
+              <a class="help-link" href="{{ help_url() }}" title="Help for this page">
+                <span class="help-icon" aria-hidden="true">?</span> Help
+              </a>
+            {% endif %}
             {% if auth_mode == 'entra' %}
               <a href="{{ url_for('auth.logout') }}">Sign out</a>
             {% endif %}

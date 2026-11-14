@@ -1,0 +1,83 @@
+<p class="lead">
+  The Reports menu holds the Access reports and the saved queries staff used most. Every report is available to all roles.
+</p>
+<ul class="help-jump">
+  <li><a href="#commission">Commission by sell date</a></li>
+  <li><a href="#publication">Publication by run date</a></li>
+  <li><a href="#labels">Mailing labels by directory year</a></li>
+  <li><a href="#advertiser-lists">Advertiser lists</a></li>
+  <li><a href="#exports">Exports</a></li>
+  <li><a href="#printing-labels">Printing labels</a></li>
+</ul>
+
+<h3 id="commission">Commission by sell date</h3>
+<p>
+  Lists the ads <strong>sold</strong> between two dates that carry a commission above 0%, grouped by Date Sold,
+  with the amount and the commission earned on each. The totals appear at the top.
+</p>
+<ol>
+  <li>Enter the <strong>Starting date</strong> and <strong>Ending date</strong>, and choose <strong>Run report</strong>.</li>
+  <li>Choose <strong>Print / Save as PDF</strong> to print it, or <strong>Download CSV</strong> to open it in Excel.</li>
+</ol>
+<p>Commission earned is the amount multiplied by Comm %. Ads with no commission or 0% are left out.</p>
+
+<h3 id="publication">Publication by run date</h3>
+<p>
+  Lists every ad that runs in <strong>one issue</strong>, sorted by advertiser, with numbered lines.
+  Use it to check an issue's ads before it goes to print.
+</p>
+<ol>
+  <li>Enter the <strong>Run date</strong>, or pick one of the recent issues from the list.</li>
+  <li>Choose <strong>Run report</strong>. It prints in landscape.</li>
+</ol>
+
+<h3 id="labels">Mailing labels by directory year</h3>
+<p>
+  Produces mailing labels for every account whose <strong>Directory Years</strong> field contains the year you enter,
+  sorted by advertiser.
+</p>
+<ol>
+  <li>Enter the <strong>Directory year</strong>, for example <code>2026</code>.</li>
+  <li>Tick <strong>Include contact name</strong> to print the contact's name under the advertiser's name on each label.</li>
+  <li>Choose <strong>Find accounts</strong> to check the list, then <strong>Open labels PDF</strong>.</li>
+</ol>
+
+<h3 id="advertiser-lists">Advertiser lists</h3>
+<p>
+  Replaces the saved Access queries, such as Christmas advertisers, Easter billing, graduation, current advertisers,
+  e-mail lists, and parish lists. An account must match <strong>every</strong> filter you fill in.
+</p>
+<ul>
+  <li><strong>Ads that ran</strong>: a run date range, specific issue dates (for example <code>12/1/2025, 12/1/2024</code>),
+      text in the section (for example <code>Xmas</code> or <code>grad</code>), or a sales rep.</li>
+  <li><strong>Accounts</strong>: text in the advertiser name or category (for example <code>parish</code>), a directory year,
+      and the status boxes.</li>
+  <li><strong>Output</strong>: one row per advertiser (an address list) or one row per ad (with amounts).</li>
+</ul>
+<p>
+  Choose <strong>Show list</strong> to see the results on screen, or <strong>Excel</strong>, <strong>CSV</strong>, or
+  <strong>Mailing labels (PDF)</strong> to download them. The screen shows the first part of a long list;
+  the downloads always include every row.
+</p>
+<p class="callout">
+  Example: <em>last year's Christmas advertisers who are still current</em>. Enter the December issue dates in
+  Specific issue dates, type <code>Xmas</code> in Section contains, tick Current advertisers, and choose One row per advertiser.
+</p>
+
+<h3 id="exports">Exports</h3>
+<p>
+  Produces an Excel workbook with one row per advertiser and description and one column per run date,
+  like the two export buttons on the Access Dashboard.
+</p>
+<ul>
+  <li><strong>Export amounts</strong>: the total amount of the ads for each run date.</li>
+  <li><strong>Export commission earned</strong>: the amount multiplied by Comm % for each run date, for every ad in the range, including 0%.</li>
+</ul>
+
+<h3 id="printing-labels">Printing labels</h3>
+<ul>
+  <li>The labels fit <strong>Avery 5160</strong> or <strong>8160</strong> sheets: 30 labels per sheet, 1" &times; 2&#8541;".</li>
+  <li>In the print dialog, choose <strong>Actual size</strong> (100%), not "Fit to page". Otherwise, the labels drift off the stickers.</li>
+  <li>To use a partly used sheet, set <strong>Start at label</strong> to the first empty position. Position 1 is the top left, and the count runs across each row.</li>
+  <li>Print one test page on plain paper and hold it against a label sheet before you print a large run.</li>
+</ul>

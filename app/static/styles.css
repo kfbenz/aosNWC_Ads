@@ -874,6 +874,247 @@ table.narrow {
   display: none;
 }
 
+/* ---------------------------------------------------------------- help */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.site-header .user-box a.help-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.site-header .user-box a.help-link:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+.help-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.help-search {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin: 1rem 0 1.5rem;
+}
+
+.help-search input {
+  flex: 1 1 22rem;
+  max-width: 36rem;
+}
+
+.help-group {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 1.5rem 0 0.6rem;
+}
+
+.help-cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: 0.75rem;
+}
+
+.help-cards a {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  height: 100%;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--brand-cyan);
+  border-radius: 6px;
+  color: var(--text);
+  text-decoration: none;
+  background: var(--surface);
+}
+
+.help-cards a:hover {
+  border-color: var(--accent);
+}
+
+.help-cards strong {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  color: var(--accent);
+}
+
+.help-cards span {
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.help-results-title {
+  margin-top: 0;
+}
+
+.help-results {
+  padding-left: 1.25rem;
+}
+
+.help-results li {
+  margin-bottom: 0.9rem;
+}
+
+.help-results a {
+  font-weight: 600;
+}
+
+.help-snippet {
+  margin: 0.2rem 0 0;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.help-layout {
+  display: grid;
+  grid-template-columns: 14rem minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.help-toc {
+  position: sticky;
+  top: 1rem;
+  font-size: 0.9rem;
+}
+
+.help-toc h4 {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 1rem 0 0.35rem;
+}
+
+.help-toc ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.help-toc li a {
+  display: block;
+  padding: 0.25rem 0.6rem;
+  border-left: 3px solid transparent;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.help-toc li a:hover {
+  color: var(--accent);
+}
+
+.help-toc li a.current {
+  border-left-color: var(--brand-cyan);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.help-toc-home {
+  font-weight: 600;
+}
+
+.help-article {
+  max-width: 50rem;
+  line-height: 1.6;
+}
+
+.help-article .lead {
+  font-size: 1.05rem;
+}
+
+.help-article h3 {
+  margin-top: 1.75rem;
+  padding-top: 0.25rem;
+  border-top: 1px solid var(--border);
+  scroll-margin-top: 1rem;
+}
+
+.help-article h4 {
+  margin: 1.25rem 0 0.35rem;
+  scroll-margin-top: 1rem;
+}
+
+.help-article :target {
+  background: #eef9fd;
+  box-shadow: -0.5rem 0 0 #eef9fd, 0.5rem 0 0 #eef9fd;
+}
+
+.help-table td:first-child {
+  white-space: nowrap;
+  vertical-align: top;
+}
+
+.help-jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.25rem;
+  padding: 0;
+  list-style: none;
+}
+
+.help-terms dt {
+  font-weight: 600;
+  margin-top: 0.75rem;
+}
+
+.help-terms dd {
+  margin: 0.15rem 0 0 1.25rem;
+}
+
+.help-pager {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 800px) {
+  .help-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .help-toc {
+    position: static;
+  }
+
+  .help-table td:first-child {
+    white-space: normal;
+    font-weight: 600;
+  }
+}
+
 @media print {
   body {
     background: #ffffff;

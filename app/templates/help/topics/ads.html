@@ -1,0 +1,71 @@
+<p class="lead">
+  An ad is one placement in one issue: what ran, when it was sold and run, its price, and who sold it.
+  Every ad belongs to an account.
+</p>
+
+<h3 id="list">The Ads list</h3>
+<p>The <strong>Ads</strong> page lists every ad, newest run date first, 50 to a page. Use the filters to narrow it:</p>
+<ul>
+  <li><strong>Search</strong> finds text in the advertiser name, the ad description, the account number, or the bill number.</li>
+  <li><strong>Sales rep</strong> shows one rep's ads. Choose <em>(none)</em> for ads without a rep.</li>
+  <li><strong>Run date from / to</strong> limits the ads to a range of issues.</li>
+</ul>
+<p>The count and total amount above the list cover every ad that matches, not only the page you see.</p>
+<p>
+  For more detailed questions, such as "current advertisers in Seattle whose ads ran last December",
+  use <a href="{{ url_for('help.topic', slug='search') }}">Search</a> or
+  <a href="{{ url_for('help.topic', slug='reports', _anchor='advertiser-lists') }}">Advertiser lists</a>.
+</p>
+
+<h3 id="view">Viewing an ad</h3>
+<p>Choose an ad to see all its fields and its advertiser. Editors also see an <strong>Edit ad</strong> button.</p>
+
+<h3 id="add">Adding an ad</h3>
+<ol>
+  <li>Open the advertiser under <strong>Accounts</strong>.</li>
+  <li>Choose <strong>Add ad</strong> in the Advertising History section.</li>
+  <li>The form starts with the Comm %, Sales, and Auth By of the account's most recent ad, and today's date as Date Sold. Change them as needed.</li>
+  <li>Fill in the other fields and choose <strong>Add ad</strong>.</li>
+</ol>
+<p>Adding an ad requires the Editor or Admin role.</p>
+
+<h3 id="edit">Editing an ad</h3>
+<p>
+  Choose <strong>Edit</strong> next to an ad in an account's Advertising History, or <strong>Edit ad</strong> on the ad's own page.
+  Change the fields and choose <strong>Save</strong>. The fields are:
+</p>
+<table class="compact help-table">
+  <thead><tr><th>Field</th><th>What to enter</th></tr></thead>
+  <tbody>
+    <tr><td>Date Sold</td><td>The date the advertiser bought the ad. The commission report groups ads by this date.</td></tr>
+    <tr><td>Date Run</td><td>The issue date the ad appears in. The publication report and exports use this date.</td></tr>
+    <tr><td>Amount</td><td>The price in dollars, for example <code>450</code> or <code>450.00</code>. A credit can be negative.</td></tr>
+    <tr><td>Comm %</td><td>The sales commission as a percentage: enter <code>10</code> for 10%, not <code>0.10</code>. Leave it blank or enter 0 when no commission applies.</td></tr>
+    <tr><td>Sales</td><td>The sales rep's code, for example <code>KH</code>.</td></tr>
+    <tr><td>Auth By</td><td>The person at the advertiser who approved the ad.</td></tr>
+    <tr><td>Size</td><td>The ad size, for example <code>1/4 page</code>.</td></tr>
+    <tr><td>Section</td><td>The section or special issue, for example a Christmas or graduation section.</td></tr>
+    <tr><td>Page</td><td>The page the ad appears on.</td></tr>
+    <tr><td>Run #</td><td>The run code, as used in Access.</td></tr>
+    <tr><td>Bill #</td><td>The invoice number.</td></tr>
+    <tr><td>Desc</td><td>A short description of the ad.</td></tr>
+    <tr><td>Notes</td><td>Anything else worth keeping.</td></tr>
+  </tbody>
+</table>
+
+<h4 id="dropdowns">Sales, Size, and Section</h4>
+<p>
+  When an Admin has set up the list of allowed values for one of these fields, the field becomes a dropdown,
+  and you must choose a value from it. If you need a value that is not on the list, ask an Admin to add it.
+</p>
+<p>
+  An older ad may show a value marked <em>(legacy, not on the list)</em>. That ad keeps its value, and you can still save it.
+  Choose a value from the list to replace it.
+</p>
+<p>When a field has no list yet, it accepts any text and suggests values that other ads already use.</p>
+
+<h3 id="delete">Deleting an ad</h3>
+<p>
+  Only Admins can delete an ad, with the <strong>Delete ad</strong> button at the bottom of its edit page.
+  Deleting cannot be undone, although the audit log keeps a copy of the deleted ad.
+</p>

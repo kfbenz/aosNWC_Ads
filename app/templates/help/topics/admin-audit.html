@@ -1,0 +1,30 @@
+<p class="lead">
+  The audit log records every change to accounts, ads, the lookup lists, and the normalization map:
+  who made it, when, and what changed.
+</p>
+
+<h3 id="reading">Reading the log</h3>
+<p>Each row shows:</p>
+<table class="compact help-table">
+  <tbody>
+    <tr><td>When (UTC)</td><td>The time of the change in Coordinated Universal Time. Seattle is 8 hours behind UTC in winter and 7 hours behind in summer.</td></tr>
+    <tr><td>User</td><td>The person who made the change, by sign-in name.</td></tr>
+    <tr><td>Action</td><td><strong>insert</strong> (created), <strong>update</strong> (changed), or <strong>delete</strong> (deleted).</td></tr>
+    <tr><td>Record</td><td>The table and the record's key: an account number, or an ad number.</td></tr>
+    <tr><td>Changes</td><td>For an update, each changed field with its old and new value. For a delete, a copy of the deleted record.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="filters">Finding a change</h3>
+<ul>
+  <li><strong>Table</strong>: choose <code>accounts</code> or <code>ad_placements</code> (ads), or one of the lookup tables.</li>
+  <li><strong>Record ID</strong>: an account number, such as <code>004017</code>, or an ad number, such as <code>11872</code>.</li>
+  <li><strong>User</strong>: part of a person's sign-in name.</li>
+</ul>
+<p>Combine the filters to answer questions such as "who changed the address on account 004017?".</p>
+
+<h3 id="restore">Restoring a value</h3>
+<p>
+  The log does not restore anything by itself. To put back an earlier value, find the change in the log,
+  open the record, and enter the old value again. A deleted ad or account must be re-created by hand from the copy in the log.
+</p>

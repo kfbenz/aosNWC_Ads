@@ -1,0 +1,51 @@
+<p class="lead">
+  Search works like the Access advanced search. It finds <strong>accounts</strong> using any mix of contact details,
+  client information, and the details of their ads.
+</p>
+
+<h3 id="fields">Filling in the form</h3>
+<p>Fill in only the fields you want to search on and choose <strong>Search</strong>. Empty fields are ignored.</p>
+<ul>
+  <li><strong>Contact</strong>: account number, advertiser, contact, address, city, state, zip, phone, fax, e-mail,
+      web site, and Directory Years.</li>
+  <li><strong>Client Information</strong>: category, special advertising opportunities, and notes, plus the status boxes
+      (current advertisers, past advertisers, prospects, and e-mail list).</li>
+  <li><strong>Ad Information</strong>: description, authorized by, sales, size, section, page, run #, bill number, and ad notes,
+      plus Date Sold and Date Run ranges, an Amount range, and Comm %.</li>
+</ul>
+
+<h3 id="text">How text matching works</h3>
+<table class="compact help-table">
+  <thead><tr><th>You type</th><th>It finds</th></tr></thead>
+  <tbody>
+    <tr><td><code>Mary</code></td><td>The text anywhere in the field: "St. Mary Parish", "Maryknoll".</td></tr>
+    <tr><td><code>St.*</code></td><td>Values that <em>start</em> with "St.". The <code>*</code> stands for any characters.</td></tr>
+    <tr><td><code>*Parish</code></td><td>Values that <em>end</em> with "Parish".</td></tr>
+    <tr><td><code>98?05</code> in Zip</td><td>The <code>?</code> stands for exactly one character: 98105, 98205, and so on.</td></tr>
+  </tbody>
+</table>
+<p>Capital and small letters match each other: <code>seattle</code> finds "Seattle".</p>
+<p>
+  Comm % takes a percentage, as on the ad form: enter <code>10</code> for 10%.
+  Amounts take plain numbers, for example <code>100</code> to <code>500</code>.
+</p>
+
+<h3 id="and-or">Match any field (OR) or all fields (AND)</h3>
+<ul>
+  <li><strong>OR</strong> (the default) finds accounts that match <em>any</em> of the fields you filled in. Use it to cast a wide net.</li>
+  <li><strong>AND</strong> finds accounts that match <em>all</em> of them. In AND mode, the ad fields must all match the
+      <em>same</em> ad: "Sales KH and Date Run in December 2025" finds accounts with a KH ad that ran in December 2025.</li>
+</ul>
+<p>The status boxes always narrow the results, in either mode. Ticking <strong>Current</strong> shows only current advertisers.</p>
+
+<h3 id="results">Results and exports</h3>
+<p>
+  The results list each matching account once, with its number of ads and last run date. Choose an account to open it.
+  Above the results:
+</p>
+<ul>
+  <li><strong>Export addresses to Excel</strong> and <strong>CSV</strong> download the addresses of every matching account, not only the page shown.</li>
+  <li><strong>Mailing labels (PDF)</strong> produces Avery 5160 labels for every matching account.
+      See <a href="{{ url_for('help.topic', slug='reports', _anchor='printing-labels') }}">Printing labels</a>.</li>
+</ul>
+<p>If nothing matches, try fewer letters with OR, or fewer fields with AND. Choose <strong>Clear</strong> to start again.</p>

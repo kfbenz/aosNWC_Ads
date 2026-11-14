@@ -1,0 +1,53 @@
+<p class="lead">
+  Lookup lists set the allowed values for an ad's <strong>Sales</strong>, <strong>Size</strong>, and <strong>Section</strong> fields.
+  A fourth list, <strong>Billed</strong>, is ready for when Billed is added to the ad form.
+</p>
+
+<h3 id="how">How the lists affect the ad form</h3>
+<ul>
+  <li>While a list is <strong>empty</strong>, its field on the ad form accepts any text and suggests values already in use.</li>
+  <li>Once a list has <strong>active</strong> entries, the field becomes a dropdown, and the system refuses any value that is not on the list.</li>
+  <li>Older ads with a value that is not on the list keep it, marked <em>(legacy, not on the list)</em>, and can still be saved.</li>
+</ul>
+<p>Each list works on its own, so you can finish Sales first and leave Size as free text until it is ready.</p>
+
+<h3 id="summary">The summary page</h3>
+<p>
+  <strong>Admin &rsaquo; Lookup lists</strong> shows each list with its number of entries, the number of different values
+  on ads, and how many ads use a value that is not on the list. That last number shows how much cleanup remains.
+</p>
+<p class="callout">
+  Work in this order: first <a href="{{ url_for('help.topic', slug='admin-merge') }}">merge spellings</a> that mean the
+  same thing (for example "1/4 pg" and "1/4 page"), and then add the remaining values to the list.
+  Otherwise, the list collects several spellings of the same value.
+</p>
+
+<h3 id="list">Managing one list</h3>
+<p>Choose <strong>Manage list</strong>. The page has two parts.</p>
+
+<h4>Entries on the list</h4>
+<ul>
+  <li><strong>Add</strong> one value, with an optional name or description in the second box. The value is what the ads store,
+      for example <code>FP</code>. The description appears beside it in the dropdown, for example "Full page".</li>
+  <li>Change an entry's description, or clear <strong>Active</strong> to hide it from the dropdown, and choose <strong>Save</strong>.
+      Deactivating keeps the value on existing ads.</li>
+  <li><strong>Remove</strong> deletes an entry, but only when no ad uses it. For a value in use, deactivate it instead.</li>
+</ul>
+
+<h4>Values used on ads but not on this list</h4>
+<p>
+  This part lists every value that ads use but the list lacks, most used first, with the number of ads.
+  Tick the values to keep and choose <strong>Add ticked values to the list</strong>. Use <strong>Find</strong> to narrow a long list.
+</p>
+<p>Some values cannot be ticked:</p>
+<ul>
+  <li>A value that differs from a list entry <strong>only by capitals</strong>, such as <code>kh</code> when <code>KH</code> is on the list.
+      Merge it into the list's spelling instead.</li>
+  <li>A value longer than 50 characters. Merge it into a shorter value.</li>
+</ul>
+
+<h3 id="rules">Rules</h3>
+<ul>
+  <li>A list cannot hold two entries that differ only by capitals.</li>
+  <li>The system records every change to a list in the audit log.</li>
+</ul>

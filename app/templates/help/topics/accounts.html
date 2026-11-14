@@ -1,0 +1,58 @@
+<p class="lead">
+  An account is one advertiser: a parish, school, business, or person who buys ads or receives mailings.
+  Each account has a six-character account number, such as <code>004017</code>.
+</p>
+
+<h3 id="list">Finding an account</h3>
+<p>The <strong>Accounts</strong> page lists every advertiser. Use the filters to narrow it:</p>
+<ul>
+  <li><strong>Search</strong> finds text in the name, account number, contact, city, e-mail, phone, or category.</li>
+  <li><strong>Show</strong> limits the list to current advertisers, past advertisers, prospects, or the e-mail list.</li>
+  <li><strong>Sort by</strong> orders the list by name, by account number (newest first), or by the most recent ad.</li>
+</ul>
+<p>The list also shows each account's number of ads and the date of its last ad.</p>
+
+<h3 id="new">Creating an account</h3>
+<ol>
+  <li>Choose <strong>New account</strong> on the Accounts page. This requires the Editor or Admin role.</li>
+  <li>The system suggests the next free account number. Keep it unless you have a reason to use another.
+      An account number uses letters and digits only, up to six characters.</li>
+  <li>Enter at least the <strong>Advertiser</strong> name, plus any contact details, and choose <strong>Create account</strong>.</li>
+</ol>
+<p>Before you create an account, search for the advertiser first, so that the same advertiser does not end up with two accounts.</p>
+
+<h3 id="detail">Viewing and editing an account</h3>
+<p>Choose an account to open it. The page has three parts:</p>
+<ul>
+  <li><strong>Contact</strong>: name, address, phone, e-mail, web site, and Directory Years.</li>
+  <li><strong>Client Information</strong>: category, special advertising opportunities, notes, and the status boxes.</li>
+  <li><strong>Advertising History</strong>: every ad for this account, newest first, with the total. Choose <strong>Add ad</strong> here to add one.</li>
+</ul>
+<p>
+  Editors can change any field and choose <strong>Save</strong>. The account number cannot change, because other records
+  and documents outside this system refer to it. Viewers see the same page in read-only form.
+</p>
+<p>Use <strong>Previous</strong> and <strong>Next</strong> to move between accounts in account-number order, as in Access.</p>
+
+<h4 id="status">Status boxes</h4>
+<table class="compact help-table">
+  <tbody>
+    <tr><td>Current Advertiser</td><td>Advertises now.</td></tr>
+    <tr><td>Past Advertiser</td><td>Has advertised before but not currently.</td></tr>
+    <tr><td>Prospect</td><td>Has not advertised yet; a sales lead.</td></tr>
+    <tr><td>E-mail List</td><td>Receives e-mail about advertising opportunities.</td></tr>
+  </tbody>
+</table>
+<p>The boxes are independent: an account can have any combination. Search and the advertiser lists use them as filters.</p>
+
+<h4 id="directory-years">Directory Years</h4>
+<p>
+  List the years the advertiser appears in the directory, separated by commas or spaces, for example <code>2025, 2026</code>.
+  The <a href="{{ url_for('help.topic', slug='reports', _anchor='labels') }}">mailing labels by directory year</a> report reads this field.
+</p>
+
+<h3 id="delete">Deleting an account</h3>
+<p>
+  Only Admins can delete an account, and only when it has no ads. If the account has ads, move or delete them first.
+  Usually it is better to clear the Current Advertiser box than to delete the account, because the history then stays available.
+</p>

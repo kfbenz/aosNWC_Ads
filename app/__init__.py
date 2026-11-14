@@ -51,6 +51,7 @@ def create_app(config_object=Config) -> Flask:
 
     from app.accounts import accounts_bp
     from app.admin import admin_bp
+    from app.help import help_bp, help_url_for_page
     from app.menu import build_menu
     from app.reports import reports_bp
     from app.routes import main_bp
@@ -62,11 +63,13 @@ def create_app(config_object=Config) -> Flask:
     app.register_blueprint(search_bp)
     app.register_blueprint(reports_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(help_bp)
 
     @app.context_processor
     def inject_layout():
         return {
             "menu": build_menu(),
+            "help_url": help_url_for_page,
             "auth_mode": app.config["AUTH_MODE"],
             "today": date.today(),
         }

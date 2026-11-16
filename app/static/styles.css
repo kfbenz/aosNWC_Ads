@@ -324,6 +324,27 @@ button:hover,
   background: var(--accent-hover);
 }
 
+/* Links styled as buttons keep button colors inside panels, report bars, and form
+   actions, whose plain-link rules (".panel a" and similar) are otherwise more specific. */
+a.button:link,
+a.button:visited,
+a.button:hover {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+a.button-secondary:link,
+a.button-secondary:visited,
+a.button-secondary:hover {
+  color: var(--accent);
+}
+
+a.button-danger:link,
+a.button-danger:visited,
+a.button-danger:hover {
+  color: var(--error);
+}
+
 .ad-form {
   display: grid;
   gap: 0.8rem;

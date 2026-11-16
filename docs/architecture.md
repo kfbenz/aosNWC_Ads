@@ -324,7 +324,7 @@ A content hash is used instead of `updated_at`, because the timestamp has one-se
 
 | Threat | Control |
 |---|---|
-| Anonymous access | Nginx IP allow list; Entra sign-in for every page except `/healthz` and the sign-in pages |
+| Anonymous access | Entra sign-in for every page except `/healthz` and the sign-in pages. The Nginx IP allow list is off since November 2026 but can be turned back on. MFA depends on the tenant's Conditional Access policies (backlog C-11). |
 | Excess privilege | Three roles; `require_role` on every changing view; tests check 403 responses |
 | Cross-site request forgery | Flask-WTF CSRF token on every POST |
 | Session theft | Signed, `HttpOnly`, `Secure`, `SameSite=Lax` cookie; 8-hour lifetime |

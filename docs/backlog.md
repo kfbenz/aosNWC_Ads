@@ -36,15 +36,16 @@ Cutover cannot happen until **C-01** (sign-in), **C-02** (backups), **C-04** and
 
 | ID | Item | Owner | Size | Status |
 |---|---|---|---|---|
-| C-01 | **Microsoft Entra sign-in.** IT creates the app registration with the three app roles, redirect URI, and front-channel logout URL, and sends the tenant ID, client ID, and client secret ([operations.md](operations.md) section 6.1). Dev sets `AUTH_MODE=entra` and tests each role. IT assigns staff to roles, preferably through groups. | IT, Dev | S | Waiting on IT |
+| C-01 | **Microsoft Entra sign-in.** IT creates the app registration with the three app roles, redirect URI, and front-channel logout URL, and sends the tenant ID, client ID, and client secret ([operations.md](operations.md) section 6.1). Dev sets `AUTH_MODE=entra` and tests each role. IT assigns staff to roles, preferably through groups. IT sent the IDs and secret on 2026-11-16; the secret expires on 2028-11-15. | IT, Dev | S | In progress: switching on |
 | C-02 | **Backups.** A nightly `mariadb-dump` with 14-day retention, Azure Backup for the VM, and a first restore test ([operations.md](operations.md) section 7). | Dev, IT | S | Proposed; not confirmed |
 | C-03 | **Restrict SSH.** The network security group allows port 22 from any address. Limit it to Archdiocese addresses, or use Azure Bastion or just-in-time access. | IT | S | Open |
 | C-04 | **Commit the import fixes.** Apply the three fixes made by hand on the server to `sql/002_staging_import.sql`: `'\r\n'` line endings, `ESCAPED BY ''`, and the commission range guard ([operations.md](operations.md) section 9.1). | Dev | S | Open |
 | C-05 | **Cutover script and runbook.** The import is not repeatable: it overwrites account edits and duplicates ads ([operations.md](operations.md) section 9.2). Write a script that backs up, empties `ad_placements`, `accounts`, and `audit_log`, imports, and prints reconciliation figures (account count, ad count, orphan count, `SUM(amount)` per year) next to the Access figures. Rehearse it once on a copy of the database. Include a rollback plan (return to Access). | Dev | M | Open |
 | C-06 | **Acceptance by the business owner.** Run each report for a recent period in both systems and compare the results. Add, edit, and search for test records. Read the in-app help and correct it. Sign off. | BO | M | Open |
 | C-07 | **Business decisions D-01 to D-05** (section 2) that affect day-one behavior. | BO | S | Open |
-| C-08 | **Allow-list policy after Entra.** Decide whether to keep the Nginx IP allow list once sign-in is on. Keeping it blocks staff who work from home; removing it exposes the sign-in page to the internet (Entra still protects it). | IT, BO | S | Open |
+| C-08 | **Allow-list policy after Entra.** Decided 2026-11-16: allow list off, so staff can work from home; Entra sign-in protects every page. | IT, BO | S | Done |
 | C-09 | **Staff orientation.** A short walk-through of Accounts, Ads, Search, and Reports, pointing to Help › Getting started. Collect the staff members' Entra accounts and roles for C-01. | BO, Dev | S | Open |
+| C-11 | **Require MFA for NWC Ads.** The first sign-in on 2026-11-16 showed no MFA prompt, and the site is now reachable from the internet. IT checks the sign-in log (Authentication Details and Conditional Access tabs) and adds NWC Ads to a Conditional Access policy that requires MFA. Afterward, Dev can add an app-side check of the `amr` claim as a second layer. | IT, Dev | S | Open; urgent |
 | C-10 | **Certificate renewal check.** Confirm that the Nginx reload hook exists, and that `certbot renew --dry-run` succeeds with the allow list in place ([operations.md](operations.md) section 8.2). | Dev | S | Open |
 
 ## 2. Decisions needed from the business owner
@@ -87,6 +88,7 @@ Do these **after** the cutover import (C-05). Changes made in NWC Ads before the
 | T-11 | **Official Northwest Catholic logo** in the header, if Communications provides one and approves its use. | Dev, BO | S | Open |
 | T-12 | **Dependency updates.** Turn on Dependabot (or run `pip-audit` quarterly), and keep `requirements.txt` current. | Dev | S | Open |
 | T-13 | **Staging environment.** A second database on the VM, or a small second VM, for rehearsing migrations and imports before production. | Dev, IT | M | Open |
+| T-15 | **Guard against `dev` mode on the internet.** With the allow list off, setting `AUTH_MODE=dev` on the server by mistake would make every visitor an Admin. Make `dev` mode answer only requests from the local machine or private networks unless an explicit override is set. | Dev | S | Open |
 | T-14 | **License comments in templates.** Source files carry the Apache header; templates and CSS do not. Optional. | Dev | S | Open |
 
 ## 5. Ideas and enhancements

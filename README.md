@@ -4,7 +4,7 @@ The advertising database for *Northwest Catholic*, the magazine of the Archdioce
 
 **Stack:** Python 3.11, Flask, SQLAlchemy, MariaDB, Microsoft Entra ID sign-in, Gunicorn and Nginx on an Azure Debian VM.
 
-**Production:** https://nwcads.archseattle.org (Archdiocese networks only)
+**Production:** https://nwcads.archseattle.org (Archdiocese Microsoft sign-in required)
 
 ## Documentation
 

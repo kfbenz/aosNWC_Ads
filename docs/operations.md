@@ -4,7 +4,7 @@ Copyright 2026 Archdiocese of Seattle. Author: Kevin F Benz.
 
 This guide describes how to run the production system: deploying updates, configuration, user access, certificates, backups, the Access cutover, and troubleshooting. [architecture.md](architecture.md) explains the design, and [developer-guide.md](developer-guide.md) explains how to change the code.
 
-> **Status (November 2026):** NWC Ads is deployed but not yet the system of record. Access remains in use until cutover. Sign-in still runs in `dev` mode behind the IP allow list, while IT completes the Entra registration. Database backups are **not yet confirmed**. [backlog.md](backlog.md) tracks these items.
+> **Status (November 2026):** NWC Ads is deployed but not yet the system of record. Access remains in use until cutover. Microsoft Entra sign-in has been on since 2026-11-16, and the Nginx IP allow list was turned off the same day, so the site is reachable from anywhere but every page requires sign-in. Whether Entra requires MFA for this app is **not yet confirmed**, and neither are database backups. [backlog.md](backlog.md) tracks these items.
 
 ## 1. Production at a glance
 
@@ -18,11 +18,12 @@ This guide describes how to run the production system: deploying updates, config
 | Configuration | `/opt/aos_nwc_ads/.env` (group `www-data`, mode `640`) |
 | Service | systemd unit `aosnwcads`: Gunicorn, 3 workers, `127.0.0.1:8000`, runs as `www-data` |
 | Web server | Nginx, site `/etc/nginx/sites-available/aosnwcads` |
-| IP allow list | `/etc/nginx/snippets/aosnwcads-allow.conf` |
+| IP allow list | **Off since 2026-11-16.** The list is kept in `/etc/nginx/snippets/aosnwcads-allow.conf` for re-enabling (section 8.1). |
 | TLS certificate | Let's Encrypt, `/etc/letsencrypt/live/nwcads.archseattle.org/`, webroot `/var/www/letsencrypt` |
 | Database | MariaDB on the same VM; database `aos_nwc_ads`, user `nwcads@localhost` |
 | Azure network security group | Inbound 22 (SSH), 80, and 443 allowed from any address |
 | Health check | `https://nwcads.archseattle.org/healthz` returns `ok` without sign-in (from an allow-listed address) |
+| Entra app registration | Application (client) ID `39168636-2fb4-4996-ae65-d2336b16234e` in the Archdiocese tenant. The client secret is only in `.env`. **The secret expires on 2028-11-15** (see section 6.3). |
 
 > The templates in `deploy/` predate the production setup. They use the path `/opt/aosnwcads`, and the Nginx template has no TLS or allow list. Treat the server as authoritative until the backlog item that aligns them is done.
 
@@ -109,7 +110,7 @@ systemd restarts the service automatically 5 seconds after a crash (`Restart=alw
 |---|---|---|
 | `SECRET_KEY` | A long random value | Signs session cookies. Changing it signs everyone out. Generate one with `python3 -c "import secrets; print(secrets.token_urlsafe(48))"`. |
 | `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` | `localhost`, `3306`, `aos_nwc_ads`, `nwcads`, (secret) | |
-| `AUTH_MODE` | `entra` after cutover; `dev` until then | The app refuses to start in `entra` mode without the three Entra values, or with the default `SECRET_KEY`. |
+| `AUTH_MODE` | `entra` | The app refuses to start in `entra` mode without the three Entra values, or with the default `SECRET_KEY`. **Never set `dev` on this server:** with the allow list off, `dev` mode would give anyone on the internet Admin access. |
 | `DEV_ROLE` | Not set | Used only in `dev` mode. |
 | `ENTRA_TENANT_ID`, `ENTRA_CLIENT_ID`, `ENTRA_CLIENT_SECRET` | From IT | See section 6. |
 | `ENTRA_REDIRECT_URI` | `https://nwcads.archseattle.org/auth/callback` | Optional; set it if sign-in redirects to the wrong address. |
@@ -135,7 +136,7 @@ IT creates an app registration in the Archdiocese tenant with these settings:
 | Supported account types | This organization only (single tenant) |
 | Redirect URI (Web) | `https://nwcads.archseattle.org/auth/callback` |
 | Front-channel logout URL | `https://nwcads.archseattle.org/auth/frontchannel-logout` |
-| ID tokens | Enabled |
+| ID tokens (implicit grant) | Not needed; leave off. The app uses the authorization code flow. |
 | API permission | Microsoft Graph `User.Read` (delegated) |
 | App roles (allowed member types: Users/Groups) | Values `NWCAds.Viewer`, `NWCAds.Editor`, `NWCAds.Admin` |
 | Client secret | Created; IT sends the value securely and records its **expiry date** |
@@ -215,16 +216,16 @@ sudo systemctl start aosnwcads
 
 ### 8.1 IP allow list
 
-Nginx admits only the addresses in `/etc/nginx/snippets/aosnwcads-allow.conf`, and refuses all others with 403. The file holds one `allow` line per address or range, followed by `deny all;`. It currently admits the Archdiocese offices' public addresses and the developer's address.
+**The allow list is off since 2026-11-16.** Entra sign-in protects every page except `/healthz` and the sign-in pages, so staff can use NWC Ads from home. The `include snippets/aosnwcads-allow.conf;` line in the Nginx site is commented out, and the snippet file still holds the Archdiocese office addresses.
 
-To add an address, for example for a staff member who works from home:
+To turn the allow list back on, for example while investigating suspicious sign-ins, or before ever running `dev` mode on this server:
 
 ```bash
-sudo nano /etc/nginx/snippets/aosnwcads-allow.conf     # Add: allow 203.0.113.10;  (before "deny all;")
+sudo sed -i 's|^\(\s*\)# include snippets/aosnwcads-allow.conf;.*|\1include snippets/aosnwcads-allow.conf;|' /etc/nginx/sites-available/aosnwcads
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
-Home internet addresses can change without notice. Once Entra sign-in is on, decide whether to keep the allow list (backlog item C-08).
+When it is on, Nginx admits only the listed addresses and refuses all others with 403. The file holds one `allow` line per address or range, followed by `deny all;`. To add an address, insert `allow 203.0.113.10;` before `deny all;`, then test and reload Nginx as above.
 
 The Let's Encrypt challenge path (`/.well-known/acme-challenge/`) must stay reachable from any address, or certificate renewal fails. It has its own `location` block that serves files from `/var/www/letsencrypt`. Keep the `include snippets/aosnwcads-allow.conf;` line inside the application's `location /` block, not at the `server` level, so that the challenge path stays outside the allow list. `sudo certbot renew --dry-run` confirms that renewal still works.
 
@@ -294,7 +295,7 @@ The full runbook is backlog item C-05. The outline:
 | Service fails; log says "refuses to start" or `RuntimeError` | Missing or invalid configuration (Entra IDs, default `SECRET_KEY`, unknown `AUTH_MODE`). | Fix `.env`. The message names the setting. |
 | "Internal Server Error"; log shows `Access denied for user` | Wrong database credentials. | Check the `DB_*` settings in `.env`. |
 | "Internal Server Error"; log shows MariaDB error 1064 | SQL that MariaDB does not support (for example `NULLS LAST`). | A code bug: fix it and deploy (see [developer-guide.md](developer-guide.md) section 6). |
-| Browser: "403 Forbidden" from Nginx (plain page) | The user's IP address is not on the allow list. | Section 8.1. |
+| Browser: "403 Forbidden" from Nginx (plain page) | The allow list is back on, and the user's IP address is not on it. | Section 8.1. |
 | App page "Not allowed" | The user's role is too low for that page. | Section 6.2. |
 | App page "No access yet" | The user signed in but has no NWC Ads role. | Section 6.2. |
 | App page "Sign-in failed" | Expired client secret, wrong Entra IDs, or wrong redirect URI. | Section 6.3; check `ENTRA_*` and the redirect URI in the registration. |

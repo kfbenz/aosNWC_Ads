@@ -278,7 +278,12 @@ client.post("/accounts/ZZ0002/delete")  # remove the test account so later count
 
 status, html, _ = get(client, "/accounts/004017")
 check("account page shows form and empty history", status == 200 and "St. Test Parish" in html and "No ads for this account yet" in html)
-check("account number is read-only on edit", re.search(r'id="account_number"[^>]*readonly', html) is not None)
+check("heading: label, bold name, and 'Account: number'",
+      '<span class="record-kind">View and Edit Advertiser:</span>' in html
+      and '<strong class="record-name">St. Test Parish</strong>' in html
+      and 'Account: <strong>004017</strong>' in html)
+check("account number has no input box on edit", 'id="account_number"' not in html)
+check("account page has a Billing Address section", "<legend>Billing Address</legend>" in html and 'id="billing_city"' in html)
 version = re.search(r'id="version" name="version" type="hidden" value="([^"]*)"', html).group(1)
 
 resp = client.post("/accounts/004017", data={**form_base, "account_number": "999999", "city": "Tacoma", "version": version})
@@ -292,6 +297,21 @@ resp = client.post("/accounts/004017", data={**form_base, "city": "Spokane", "ve
 with dev_app.app_context():
     check("stale edit blocked (someone else saved)", db.session.get(Account, "004017").city == "Tacoma"
           and "Someone else saved this account" in resp.get_data(as_text=True))
+
+status, html, _ = get(client, "/accounts/004017")
+version = re.search(r'id="version" name="version" type="hidden" value="([^"]*)"', html).group(1)
+billing = {"billing_address1": "PO Box 2015", "billing_city": "Seattle", "billing_state_code": "WA",
+           "billing_postal_code": "98104"}
+resp = client.post("/accounts/004017", data={**form_base, "city": "Tacoma", **billing, "version": version})
+with dev_app.app_context():
+    acct = db.session.get(Account, "004017")
+    check("billing address saved, contact address kept",
+          (acct.billing_address1, acct.billing_city, acct.billing_state_code, acct.billing_postal_code)
+          == ("PO Box 2015", "Seattle", "WA", "98104") and acct.city == "Tacoma" and acct.billing_address2 is None)
+    upd = db.session.scalars(select(AuditLog).where(AuditLog.entity_id == "004017").order_by(AuditLog.id.desc())).first()
+    check("billing address change audited", json.loads(upd.changes).get("billing_city") == [None, "Seattle"])
+status, html, _ = get(client, "/accounts/004017")
+check("billing address shown after save", 'value="PO Box 2015"' in html)
 
 status, html, _ = get(client, f"/accounts/{linked.account_number}")
 check("existing account shows its ads with Edit links", status == 200 and f'/ads/{linked_id}/edit' in html)

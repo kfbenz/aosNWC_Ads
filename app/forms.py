@@ -76,6 +76,12 @@ class AccountForm(FlaskForm):
     website = _text("Web site", 255)
     directory_years = _text("Directory Years", 255)
 
+    billing_address1 = _text("Address", 255)
+    billing_address2 = _text("Address 2", 50)
+    billing_city = _text("City", 50)
+    billing_state_code = _text("State", 8)
+    billing_postal_code = _text("Zip", 12)
+
     category = _text("Category", 255)
     ad_ops = _area("Special Advertising Opportunities")
     contact_notes = _area("Notes")
@@ -88,9 +94,12 @@ class AccountForm(FlaskForm):
         "account_number", "advertiser", "contact_name", "address1", "address2", "city",
         "state_code", "postal_code", "phone", "fax", "email", "website", "directory_years",
     )
+    BILLING_FIELDS = (
+        "billing_address1", "billing_address2", "billing_city", "billing_state_code", "billing_postal_code",
+    )
     RIGHT_FIELDS = ("category", "ad_ops", "contact_notes")
     FLAG_FIELDS = ("is_current_advertiser", "is_past_advertiser", "is_email_list", "is_prospect")
-    MODEL_FIELDS = LEFT_FIELDS + RIGHT_FIELDS + FLAG_FIELDS
+    MODEL_FIELDS = LEFT_FIELDS + BILLING_FIELDS + RIGHT_FIELDS + FLAG_FIELDS
 
 
 class AdForm(FlaskForm):

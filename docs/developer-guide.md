@@ -130,7 +130,7 @@ Each recipe lists every place a change touches. The tests catch many omissions, 
 Example: a `county` field.
 
 1. **Migration**: create `migrations/versions/0003_account_county.py` (recipe 4.8) with `op.add_column("accounts", sa.Column("county", sa.String(50), nullable=True))`, and a matching `downgrade`.
-2. **Schema file**: add the column to `sql/001_target_schema.sql`, so that a fresh database matches. The baseline migration uses `CREATE TABLE IF NOT EXISTS`, so this does not affect existing databases.
+2. **Schema file**: do **not** change `sql/001_target_schema.sql`. It is the frozen baseline that `0001_baseline` runs. On a fresh database, the baseline creates the table and the new migration then adds the column; if the baseline already had the column, the migration would fail with "duplicate column". `0003_account_billing_address.py` is a worked example.
 3. **Model**: add `county = db.Column(db.String(50))` to `Account` in `app/target_models.py`.
 4. **Form**: add `county = _text("County", 50)` to `AccountForm` in `app/forms.py`, and add `"county"` to `LEFT_FIELDS` or `RIGHT_FIELDS`. The account page renders those lists automatically, and `MODEL_FIELDS` saves them.
 5. **Search** (if it should be searchable): add a row to `CONTACT_FIELDS` or `CLIENT_FIELDS` in `app/search.py`.
@@ -162,7 +162,7 @@ For an entirely new lookup list, first add a table (recipe 4.5), then add an ent
 ### 4.5 Add a table
 
 1. Add the model to `app/target_models.py`. Set `__audited__ = True` if its changes should be audited, which is the default expectation for business data.
-2. Write a migration that creates it (recipe 4.8), and add it to `sql/001_target_schema.sql`.
+2. Write a migration that creates it (recipe 4.8). Leave `sql/001_target_schema.sql` unchanged; it is the frozen baseline.
 3. If Admins should see it in the audit log filter, add its table name to `AUDITED_ENTITIES` in `app/admin.py`.
 4. In the test script, any `BigInteger` or `SmallInteger` primary key must be switched to `Integer` for SQLite, as the script already does for the existing tables (see section 6).
 

@@ -261,7 +261,7 @@ erDiagram
     }
 ```
 
-`sql/001_target_schema.sql` holds the authoritative column list, and `app/target_models.py` mirrors it. The `ads` table and `app/models.py` are leftovers from the project template and are unused (see the backlog).
+The current schema is `sql/001_target_schema.sql` (the frozen baseline) plus the migrations in `migrations/versions/`; for example, `0003` adds the accounts' billing address (`billing_address1`, `billing_address2`, `billing_city`, `billing_state_code`, `billing_postal_code`). `app/target_models.py` always reflects the current schema. The `ads` table and `app/models.py` are leftovers from the project template and are unused (see the backlog).
 
 ### 6.2 Data rules and their reasons
 

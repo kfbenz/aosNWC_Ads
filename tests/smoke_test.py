@@ -301,6 +301,13 @@ check("account page has a Billing Information section", "<legend class=\"section
 right = html.split('<div class="fieldset-stack">')[1]
 check("Billing Information is first in the right column, level with Contact Information",
       right.index("<legend class=\"section-title\">Billing Information</legend>") < right.index("<legend>Customer Information</legend>"))
+first_left = re.search(r'<label class="([^"]*)"[^>]*>\s*<span[^>]*>([^<]*)', contact)
+billing_part = right.split("</fieldset>")[0]
+first_right = re.search(r'<label class="([^"]*)"[^>]*>\s*<span[^>]*>([^<]*)', billing_part)
+check("first line: 'Name:' (left) and 'Billing Name:' (right), each label and box on one line",
+      first_left and first_left.group(2).strip() == "Name:" and "inline-field" in first_left.group(1)
+      and first_right and first_right.group(2).strip() == "Billing Name:" and "inline-field" in first_right.group(1)
+      and 'id="contact_name"' in contact and 'id="billing_name"' in billing_part)
 version = re.search(r'id="version" name="version" type="hidden" value="([^"]*)"', html).group(1)
 
 resp = client.post("/accounts/004017", data={**form_base, "account_number": "999999", "city": "Tacoma", "version": version})
@@ -317,14 +324,15 @@ with dev_app.app_context():
 
 status, html, _ = get(client, "/accounts/004017")
 version = re.search(r'id="version" name="version" type="hidden" value="([^"]*)"', html).group(1)
-billing = {"billing_address1": "PO Box 2015", "billing_city": "Seattle", "billing_state_code": "WA",
-           "billing_postal_code": "98104"}
+billing = {"billing_name": "Pat Treasurer", "billing_address1": "PO Box 2015", "billing_city": "Seattle",
+           "billing_state_code": "WA", "billing_postal_code": "98104"}
 resp = client.post("/accounts/004017", data={**form_base, "city": "Tacoma", **billing, "version": version})
 with dev_app.app_context():
     acct = db.session.get(Account, "004017")
-    check("billing address saved, contact address kept",
-          (acct.billing_address1, acct.billing_city, acct.billing_state_code, acct.billing_postal_code)
-          == ("PO Box 2015", "Seattle", "WA", "98104") and acct.city == "Tacoma" and acct.billing_address2 is None)
+    check("billing name and address saved, contact kept",
+          (acct.billing_name, acct.billing_address1, acct.billing_city, acct.billing_state_code, acct.billing_postal_code)
+          == ("Pat Treasurer", "PO Box 2015", "Seattle", "WA", "98104")
+          and acct.city == "Tacoma" and acct.contact_name == form_base.get("contact_name") and acct.billing_address2 is None)
     upd = db.session.scalars(select(AuditLog).where(AuditLog.entity_id == "004017").order_by(AuditLog.id.desc())).first()
     check("billing address change audited", json.loads(upd.changes).get("billing_city") == [None, "Seattle"])
 status, html, _ = get(client, "/accounts/004017")

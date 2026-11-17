@@ -29,6 +29,7 @@ class Account(db.Model):
     state_code = db.Column(db.String(8), nullable=True)
     postal_code = db.Column(db.String(12), nullable=True)
     # Where invoices go, when it differs from the contact address above.
+    billing_name = db.Column(db.String(255), nullable=True)
     billing_address1 = db.Column(db.String(255), nullable=True)
     billing_address2 = db.Column(db.String(50), nullable=True)
     billing_city = db.Column(db.String(50), nullable=True)

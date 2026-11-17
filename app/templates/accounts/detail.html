@@ -54,7 +54,9 @@
       <div class="two-col">
         <fieldset>
           <legend class="section-title">Contact Information</legend>
-          {% for name in form.LEFT_FIELDS if name not in ('account_number', 'advertiser') %}
+          {# First line of each column: the person's name, label and box on one line, level with Billing Name. #}
+          {{ inline_field(form.contact_name, 'Name:', editable=can_edit) }}
+          {% for name in form.LEFT_FIELDS if name not in ('account_number', 'advertiser', 'contact_name') %}
             {{ f.field(form[name], editable=can_edit) }}
           {% endfor %}
         </fieldset>
@@ -62,10 +64,11 @@
         <div class="fieldset-stack">
           <fieldset>
             <legend class="section-title">Billing Information</legend>
-            <p class="hint">Where invoices go. Leave blank when bills go to the contact address.</p>
-            {% for name in form.BILLING_FIELDS %}
+            {{ inline_field(form.billing_name, 'Billing Name:', editable=can_edit) }}
+            {% for name in form.BILLING_FIELDS if name != 'billing_name' %}
               {{ f.field(form[name], editable=can_edit) }}
             {% endfor %}
+            <p class="hint">The person and address that receive invoices. Leave blank when bills go to the contact above.</p>
           </fieldset>
 
           <fieldset>

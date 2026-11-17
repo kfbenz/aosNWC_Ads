@@ -2,11 +2,14 @@
 {% import '_form.html' as f %}
 {% block title %}{{ account.advertiser if account else 'New account' }}{% endblock %}
 
-{# A label and its input on one line, for the account's key fields. #}
-{% macro inline_field(fld, text, editable=true) -%}
-  <label class="inline-field{{ ' has-error' if fld.errors }}" for="{{ fld.id }}">
-    <span class="inline-label">{{ text }}{% if fld.flags.required %} <abbr class="required-mark" title="required">*</abbr>{% endif %}</span>
-    {{ fld() if editable else fld(disabled=True) }}
+{# "Field Name:" and its value on one line. Text defaults to the form label plus a colon. #}
+{% macro inline_field(fld, text=none, editable=true) -%}
+  {%- set is_area = fld.type == 'TextAreaField' -%}
+  {%- set attrs = {'rows': 3} if is_area else {} -%}
+  {%- if not editable %}{% set _ = attrs.update({'disabled': true}) %}{% endif -%}
+  <label class="inline-field{{ ' inline-top' if is_area }}{{ ' has-error' if fld.errors }}" for="{{ fld.id }}">
+    <span class="inline-label">{{ text or (fld.label.text ~ ':') }}{% if fld.flags.required %} <abbr class="required-mark" title="required">*</abbr>{% endif %}</span>
+    {{ fld(**attrs) }}
     {%- for err in fld.errors %}<small class="field-error">{{ err }}</small>{% endfor %}
   </label>
 {%- endmacro %}
@@ -57,7 +60,7 @@
           {# First line of each column: the person's name, label and box on one line, level with Billing Name. #}
           {{ inline_field(form.contact_name, 'Name:', editable=can_edit) }}
           {% for name in form.LEFT_FIELDS if name not in ('account_number', 'advertiser', 'contact_name') %}
-            {{ f.field(form[name], editable=can_edit) }}
+            {{ inline_field(form[name], editable=can_edit) }}
           {% endfor %}
         </fieldset>
 
@@ -66,7 +69,7 @@
             <legend class="section-title">Billing Information</legend>
             {{ inline_field(form.billing_name, 'Billing Name:', editable=can_edit) }}
             {% for name in form.BILLING_FIELDS if name != 'billing_name' %}
-              {{ f.field(form[name], editable=can_edit) }}
+              {{ inline_field(form[name], editable=can_edit) }}
             {% endfor %}
             <p class="hint">The person and address that receive invoices. Leave blank when bills go to the contact above.</p>
           </fieldset>
@@ -74,7 +77,7 @@
           <fieldset>
             <legend>Customer Information</legend>
             {% for name in form.RIGHT_FIELDS %}
-              {{ f.field(form[name], editable=can_edit) }}
+              {{ inline_field(form[name], editable=can_edit) }}
             {% endfor %}
             <div class="checks">
               {% for name in form.FLAG_FIELDS %}

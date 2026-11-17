@@ -45,6 +45,7 @@ from app import create_app  # noqa: E402
 from app.audit import AuditLog  # noqa: E402
 from app.auth import CurrentUser  # noqa: E402
 from app.extensions import db  # noqa: E402
+from app.forms import AccountForm  # noqa: E402
 from app.target_models import Account, AdPlacement  # noqa: E402
 
 CSV_DIR = os.path.join(PROJECT, "exports", "access_csv")
@@ -308,6 +309,14 @@ check("first line: 'Name:' (left) and 'Billing Name:' (right), each label and bo
       first_left and first_left.group(2).strip() == "Name:" and "inline-field" in first_left.group(1)
       and first_right and first_right.group(2).strip() == "Billing Name:" and "inline-field" in first_right.group(1)
       and 'id="contact_name"' in contact and 'id="billing_name"' in billing_part)
+columns = html.split('<div class="two-col">', 1)[1].split('<div class="form-actions">')[0]
+text_ids = [n for n in AccountForm.LEFT_FIELDS + AccountForm.BILLING_FIELDS + AccountForm.RIGHT_FIELDS
+            if n not in ("account_number", "advertiser")]
+labels = dict(re.findall(r'<label class="inline-field[^"]*" for="([^"]+)">\s*<span class="inline-label">([^<]*)', columns))
+check("every text field in both columns is 'Field Name:' with its value on one line",
+      all(n in labels and labels[n].strip().endswith(":") for n in text_ids)
+      and labels.get("city", "").strip() == "City:" and labels.get("billing_city", "").strip() == "City:")
+check("multi-line fields keep their label at the top", 'class="inline-field inline-top" for="contact_notes"' in columns)
 version = re.search(r'id="version" name="version" type="hidden" value="([^"]*)"', html).group(1)
 
 resp = client.post("/accounts/004017", data={**form_base, "account_number": "999999", "city": "Tacoma", "version": version})

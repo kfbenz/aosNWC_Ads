@@ -587,17 +587,37 @@ h2 small {
   align-items: start;
 }
 
+/* Every "Field Name:" on the account page has the same width, so the values line up in each column.
+   A long label (for example "Special Advertising Opportunities:") wraps onto a second line. */
 .inline-field {
   display: grid;
-  grid-template-columns: max-content minmax(0, 1fr);
+  grid-template-columns: 9.5rem minmax(0, 1fr);
   align-items: center;
   gap: 0.35rem 0.6rem;
   min-height: 2.3rem;
   font-weight: 600;
 }
 
+.inline-field .inline-label {
+  overflow-wrap: anywhere;
+}
+
+.inline-field.inline-top {
+  align-items: start;
+}
+
+.inline-field.inline-top .inline-label {
+  padding-top: 0.45rem;
+}
+
 .inline-field .field-error {
   grid-column: 2;
+}
+
+@media (max-width: 420px) {
+  .inline-field {
+    grid-template-columns: 7.5rem minmax(0, 1fr);
+  }
 }
 
 .record-number {

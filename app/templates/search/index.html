@@ -38,7 +38,7 @@
 
       <div class="two-col">
         <fieldset>
-          <legend>Contact</legend>
+          <legend>Contact Information</legend>
           {% for name, label, _col in contact_fields %}
             {{ text_input(name, label, 'dl-advertisers' if name == 'advertiser' else none) }}
           {% endfor %}
@@ -46,7 +46,7 @@
 
         <div class="search-right">
           <fieldset>
-            <legend>Client Information</legend>
+            <legend>Customer Information</legend>
             {% for name, label, _col in client_fields %}
               {{ text_input(name, label) }}
             {% endfor %}

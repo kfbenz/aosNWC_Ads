@@ -290,7 +290,10 @@ check("edit: key row has 'Account:' with the number, then 'Advertiser:' with its
       re.search(r'Account:</span>\s*<strong class="record-number">004017</strong>', keys) is not None
       and keys.index("Account:") < keys.index("Advertiser:")
       and 'id="advertiser"' in keys and 'value="St. Test Parish"' in keys)
-contact = html.split("<legend>Contact</legend>")[1].split("</fieldset>")[0]
+check("section names: Contact Information and Customer Information",
+      "<legend>Contact Information</legend>" in html and "<legend>Customer Information</legend>" in html
+      and "Client Information" not in html)
+contact = html.split("<legend>Contact Information</legend>")[1].split("</fieldset>")[0]
 check("edit: Advertiser and Account no longer in the Contact section",
       'id="advertiser"' not in contact and 'id="account_number"' not in contact)
 check("account number has no input box on edit", 'id="account_number"' not in html)

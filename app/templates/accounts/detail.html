@@ -5,7 +5,7 @@
 {# A label and its input on one line, for the account's key fields. #}
 {% macro inline_field(fld, text, editable=true) -%}
   <label class="inline-field{{ ' has-error' if fld.errors }}" for="{{ fld.id }}">
-    <span class="inline-label">{{ text }}{% if fld.flags.required %} <abbr title="required">*</abbr>{% endif %}</span>
+    <span class="inline-label">{{ text }}{% if fld.flags.required %} <abbr class="required-mark" title="required">*</abbr>{% endif %}</span>
     {{ fld() if editable else fld(disabled=True) }}
     {%- for err in fld.errors %}<small class="field-error">{{ err }}</small>{% endfor %}
   </label>
@@ -53,7 +53,7 @@
 
       <div class="two-col">
         <fieldset>
-          <legend>Contact</legend>
+          <legend>Contact Information</legend>
           {% for name in form.LEFT_FIELDS if name not in ('account_number', 'advertiser') %}
             {{ f.field(form[name], editable=can_edit) }}
           {% endfor %}
@@ -69,7 +69,7 @@
           </fieldset>
 
           <fieldset>
-            <legend>Client Information</legend>
+            <legend>Customer Information</legend>
             {% for name in form.RIGHT_FIELDS %}
               {{ f.field(form[name], editable=can_edit) }}
             {% endfor %}

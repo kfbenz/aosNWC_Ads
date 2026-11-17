@@ -10,7 +10,7 @@
     </label>
   {%- else -%}
     <label class="{{ cls }}{{ ' has-error' if fld.errors }}">
-      <span>{{ fld.label.text }}{% if fld.flags.required %} <abbr title="required">*</abbr>{% endif %}</span>
+      <span>{{ fld.label.text }}{% if fld.flags.required %} <abbr class="required-mark" title="required">*</abbr>{% endif %}</span>
       {%- if fld.type == 'TextAreaField' %}
         {{ fld(rows=4, **attrs) }}
       {%- else %}

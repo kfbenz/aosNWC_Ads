@@ -104,6 +104,7 @@ The script is a plain Python program, not a pytest suite. Converting it is a bac
 - Styles live in `app/static/styles.css` only. Use the color variables at the top of the file (`--accent`, `--brand-cyan`, `--muted`, and so on), not new hard-coded colors.
 - Add no JavaScript framework and no build step. Small inline handlers, such as a confirm dialog or a print button, are fine.
 - Write all on-screen text and help in **formal English and the active voice, without contractions**. Prefer the staff's own terms from Access ("Advertiser", "Date Run", "Comm %").
+- Mark required fields with a red asterisk: `<abbr class="required-mark" title="required">*</abbr>` after the label. The `field` macro in `_form.html` adds it automatically for fields with a `DataRequired` validator.
 - Confirm destructive actions with `onsubmit="return confirm('...')"`, and say what cannot be undone.
 
 ### 3.3 Git

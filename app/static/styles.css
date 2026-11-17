@@ -356,6 +356,15 @@ label {
   font-weight: 600;
 }
 
+/* The asterisk after a required field's label. */
+.required-mark,
+abbr[title="required"] {
+  color: var(--error);
+  font-weight: 700;
+  text-decoration: none;
+  cursor: help;
+}
+
 input,
 textarea {
   width: 100%;

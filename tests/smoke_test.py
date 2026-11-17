@@ -254,6 +254,10 @@ check("accounts page past end clamps to last page", status == 200 and "Page 17 o
 
 status, html, _ = get(client, "/accounts/new")
 check("new account suggests next number 004017", status == 200 and 'value="004017"' in html)
+keys = html.split('class="two-col record-keys"')[1].split("<fieldset>")[0]
+check("new: key row has Account input on the left and Advertiser input on the right",
+      'id="account_number"' in keys and 'id="advertiser"' in keys
+      and keys.index('id="account_number"') < keys.index('id="advertiser"'))
 
 form_base = {
     "account_number": "004017", "advertiser": "St. Test Parish", "contact_name": "Fr. Test",
@@ -278,10 +282,17 @@ client.post("/accounts/ZZ0002/delete")  # remove the test account so later count
 
 status, html, _ = get(client, "/accounts/004017")
 check("account page shows form and empty history", status == 200 and "St. Test Parish" in html and "No ads for this account yet" in html)
-check("heading: label, bold name, and 'Account: number'",
+check("heading: label and bold name",
       '<span class="record-kind">View and Edit Advertiser:</span>' in html
-      and '<strong class="record-name">St. Test Parish</strong>' in html
-      and 'Account: <strong>004017</strong>' in html)
+      and '<strong class="record-name">St. Test Parish</strong>' in html)
+keys = html.split('class="two-col record-keys"')[1].split("<fieldset>")[0]
+check("edit: key row has 'Account:' with the number, then 'Advertiser:' with its input",
+      re.search(r'Account:</span>\s*<strong class="record-number">004017</strong>', keys) is not None
+      and keys.index("Account:") < keys.index("Advertiser:")
+      and 'id="advertiser"' in keys and 'value="St. Test Parish"' in keys)
+contact = html.split("<legend>Contact</legend>")[1].split("</fieldset>")[0]
+check("edit: Advertiser and Account no longer in the Contact section",
+      'id="advertiser"' not in contact and 'id="account_number"' not in contact)
 check("account number has no input box on edit", 'id="account_number"' not in html)
 check("account page has a Billing Address section", "<legend>Billing Address</legend>" in html and 'id="billing_city"' in html)
 version = re.search(r'id="version" name="version" type="hidden" value="([^"]*)"', html).group(1)

@@ -2,6 +2,15 @@
 {% import '_form.html' as f %}
 {% block title %}{{ account.advertiser if account else 'New account' }}{% endblock %}
 
+{# A label and its input on one line, for the account's key fields. #}
+{% macro inline_field(fld, text, editable=true) -%}
+  <label class="inline-field{{ ' has-error' if fld.errors }}" for="{{ fld.id }}">
+    <span class="inline-label">{{ text }}{% if fld.flags.required %} <abbr title="required">*</abbr>{% endif %}</span>
+    {{ fld() if editable else fld(disabled=True) }}
+    {%- for err in fld.errors %}<small class="field-error">{{ err }}</small>{% endfor %}
+  </label>
+{%- endmacro %}
+
 {% block content %}
   <div class="record-nav">
     <a href="{{ url_for('accounts.index') }}">&laquo; All accounts</a>
@@ -19,7 +28,6 @@
           <span class="record-kind">View and Edit Advertiser:</span>
           <strong class="record-name">{{ account.advertiser or '(no name)' }}</strong>
         </h2>
-        <p class="record-id">Account: <strong>{{ account.account_number }}</strong></p>
       </div>
     {% else %}
       <h2>New Advertiser</h2>
@@ -29,14 +37,25 @@
       {{ form.csrf_token }}
       {{ form.version }}
 
+      {# Key fields: Account on the left, Advertiser on the right, aligned with the columns below. #}
+      <div class="two-col record-keys">
+        {% if account %}
+          {# An existing account's number cannot be changed, so it is shown as text. #}
+          <div class="inline-field">
+            <span class="inline-label">Account:</span>
+            <strong class="record-number">{{ account.account_number }}</strong>
+          </div>
+        {% else %}
+          {{ inline_field(form.account_number, 'Account:') }}
+        {% endif %}
+        {{ inline_field(form.advertiser, 'Advertiser:', editable=can_edit) }}
+      </div>
+
       <div class="two-col">
         <fieldset>
           <legend>Contact</legend>
-          {% for name in form.LEFT_FIELDS %}
-            {# An existing account's number is shown in the heading; it cannot be changed. #}
-            {% if not (account and name == 'account_number') %}
-              {{ f.field(form[name], editable=can_edit) }}
-            {% endif %}
+          {% for name in form.LEFT_FIELDS if name not in ('account_number', 'advertiser') %}
+            {{ f.field(form[name], editable=can_edit) }}
           {% endfor %}
         </fieldset>
 

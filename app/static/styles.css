@@ -565,14 +565,28 @@ h2 small {
   font-weight: 700;
 }
 
-.record-id {
-  margin: 0;
-  font-size: 0.95rem;
-  color: var(--muted);
+/* Account page key fields: "Account:" and "Advertiser:" each with its value on the same line. */
+.record-keys {
+  margin-bottom: 1rem;
+  align-items: start;
 }
 
-.record-id strong {
-  color: var(--text);
+.inline-field {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: center;
+  gap: 0.35rem 0.6rem;
+  min-height: 2.3rem;
+  font-weight: 600;
+}
+
+.inline-field .field-error {
+  grid-column: 2;
+}
+
+.record-number {
+  font-size: 1.1rem;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
 

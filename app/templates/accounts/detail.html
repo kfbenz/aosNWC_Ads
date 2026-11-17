@@ -75,7 +75,7 @@
           </fieldset>
 
           <fieldset>
-            <legend>Customer Information</legend>
+            <legend class="section-title">Customer Information</legend>
             {% for name in form.RIGHT_FIELDS %}
               {{ inline_field(form[name], editable=can_edit) }}
             {% endfor %}

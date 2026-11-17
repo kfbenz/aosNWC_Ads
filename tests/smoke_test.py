@@ -292,7 +292,7 @@ check("edit: key row has 'Account:' with the number, then 'Advertiser:' with its
       and keys.index("Account:") < keys.index("Advertiser:")
       and 'id="advertiser"' in keys and 'value="St. Test Parish"' in keys)
 check("section names: Contact Information and Customer Information",
-      "<legend class=\"section-title\">Contact Information</legend>" in html and "<legend>Customer Information</legend>" in html
+      "<legend class=\"section-title\">Contact Information</legend>" in html and "<legend class=\"section-title\">Customer Information</legend>" in html
       and "Client Information" not in html)
 contact = html.split("<legend class=\"section-title\">Contact Information</legend>")[1].split("</fieldset>")[0]
 check("edit: Advertiser and Account no longer in the Contact section",
@@ -301,7 +301,7 @@ check("account number has no input box on edit", 'id="account_number"' not in ht
 check("account page has a Billing Information section", "<legend class=\"section-title\">Billing Information</legend>" in html and 'id="billing_city"' in html)
 right = html.split('<div class="fieldset-stack">')[1]
 check("Billing Information is first in the right column, level with Contact Information",
-      right.index("<legend class=\"section-title\">Billing Information</legend>") < right.index("<legend>Customer Information</legend>"))
+      right.index("<legend class=\"section-title\">Billing Information</legend>") < right.index("<legend class=\"section-title\">Customer Information</legend>"))
 first_left = re.search(r'<label class="([^"]*)"[^>]*>\s*<span[^>]*>([^<]*)', contact)
 billing_part = right.split("</fieldset>")[0]
 first_right = re.search(r'<label class="([^"]*)"[^>]*>\s*<span[^>]*>([^<]*)', billing_part)

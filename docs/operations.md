@@ -1,4 +1,4 @@
-# NWC Ads: Operations Guide
+Operations Guide
 
 Copyright 2026 Archdiocese of Seattle. Author: Kevin F Benz.
 

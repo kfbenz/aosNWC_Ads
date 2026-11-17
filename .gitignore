@@ -11,3 +11,6 @@ migrations/__pycache__/
 *.accdb
 *.laccdb
 exports/
+
+# Local notes that hold secrets. Never commit.
+docs/Entra Registration

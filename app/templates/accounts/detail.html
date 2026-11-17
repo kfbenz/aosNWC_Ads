@@ -53,7 +53,7 @@
 
       <div class="two-col">
         <fieldset>
-          <legend>Contact Information</legend>
+          <legend class="section-title">Contact Information</legend>
           {% for name in form.LEFT_FIELDS if name not in ('account_number', 'advertiser') %}
             {{ f.field(form[name], editable=can_edit) }}
           {% endfor %}
@@ -61,7 +61,7 @@
 
         <div class="fieldset-stack">
           <fieldset>
-            <legend>Billing Information</legend>
+            <legend class="section-title">Billing Information</legend>
             <p class="hint">Where invoices go. Leave blank when bills go to the contact address.</p>
             {% for name in form.BILLING_FIELDS %}
               {{ f.field(form[name], editable=can_edit) }}

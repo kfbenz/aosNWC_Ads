@@ -11,6 +11,7 @@
   --brand-cyan: #00a3da;      /* decorative only: bars, underlines (fails contrast as text on white) */
   --accent: #00769f;          /* links and buttons: deeper cyan, 4.9:1 on white */
   --accent-hover: #005a7a;
+  --dark-blue: #003a5d;       /* section titles: same hue family as the accent, 12:1 on white */
   --success: #1f6b43;
   --error: #b42318;
   --font-serif: "Libertinus Serif", Georgia, "Times New Roman", serif;
@@ -531,6 +532,12 @@ h2 small {
 .record-form legend {
   font-weight: 700;
   padding: 0 0.35rem;
+}
+
+/* The account page's main column titles: Contact Information and Billing Information. */
+.record-form legend.section-title {
+  color: var(--dark-blue);
+  font-size: 1.25rem;
 }
 
 .two-col {

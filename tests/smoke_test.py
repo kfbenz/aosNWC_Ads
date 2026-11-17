@@ -297,7 +297,10 @@ contact = html.split("<legend>Contact Information</legend>")[1].split("</fieldse
 check("edit: Advertiser and Account no longer in the Contact section",
       'id="advertiser"' not in contact and 'id="account_number"' not in contact)
 check("account number has no input box on edit", 'id="account_number"' not in html)
-check("account page has a Billing Address section", "<legend>Billing Address</legend>" in html and 'id="billing_city"' in html)
+check("account page has a Billing Information section", "<legend>Billing Information</legend>" in html and 'id="billing_city"' in html)
+right = html.split('<div class="fieldset-stack">')[1]
+check("Billing Information is first in the right column, level with Contact Information",
+      right.index("<legend>Billing Information</legend>") < right.index("<legend>Customer Information</legend>"))
 version = re.search(r'id="version" name="version" type="hidden" value="([^"]*)"', html).group(1)
 
 resp = client.post("/accounts/004017", data={**form_base, "account_number": "999999", "city": "Tacoma", "version": version})

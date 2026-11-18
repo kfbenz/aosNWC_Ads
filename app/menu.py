@@ -26,8 +26,8 @@ from flask import current_app, g, request, url_for
 
 # Each item: label, endpoint, minimum role, extra endpoints that mark it active, children.
 MENU = [
-    {"label": "Ads", "endpoint": "main.index", "role": "Viewer", "also": ("main.ad_detail",)},
     {"label": "Accounts", "endpoint": "accounts.index", "role": "Viewer", "also_prefix": "accounts."},
+    {"label": "Ads", "endpoint": "main.index", "role": "Viewer", "also": ("main.ad_detail",)},
     {"label": "Search", "endpoint": "search.index", "role": "Viewer", "also_prefix": "search."},
     {
         "label": "Reports",

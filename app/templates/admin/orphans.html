@@ -21,8 +21,11 @@
       </div>
     </form>
 
+    {# Search list for "Attach to account". The account name, contact, and city are part of each entry's
+       value, so typing any of them finds the account in every browser. The server reads the number
+       from the start of the entry. #}
     <datalist id="dl-accounts">
-      {% for number, name in accounts %}<option value="{{ number }}">{{ name or '' }}</option>{% endfor %}
+      {% for a in accounts %}<option value="{{ [a.account_number, a.advertiser or '(no name)', a.contact_name, a.city]|select|join(' - ') }}"></option>{% endfor %}
     </datalist>
 
     {% for grp in groups %}
@@ -61,9 +64,10 @@
             <input type="hidden" name="action" value="attach">
             <input type="hidden" name="q" value="{{ q }}">
             <input type="hidden" name="page" value="{{ page }}">
-            <label>
+            <label class="account-search">
               Attach to account
-              <input name="account_number" list="dl-accounts" value="{{ d.suggestion or '' }}" placeholder="Account #" size="10" required>
+              <input type="search" name="account_number" list="dl-accounts" value="{{ d.suggestion or '' }}"
+                     placeholder="Type a name, number, contact, or city" autocomplete="off" required>
             </label>
             <button type="submit">Attach {{ grp.ad_count }}</button>
             {% if d.suggestion %}

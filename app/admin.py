@@ -141,8 +141,11 @@ def orphans():
             "can_create": bool(ACCOUNT_NUMBER_RE.match(g.legacy.upper())) and g.legacy.upper() not in known,
         }
 
+    # Every account for the "Attach to account" search list. Each entry carries the
+    # number, name, contact, and city, so typing any of them finds the account.
     accounts = db.session.execute(
-        select(Account.account_number, Account.advertiser).order_by(Account.advertiser)
+        select(Account.account_number, Account.advertiser, Account.contact_name, Account.city)
+        .order_by(Account.advertiser, Account.account_number)
     ).all()
 
     return render_template(
@@ -150,7 +153,7 @@ def orphans():
         groups=groups,
         details=details,
         accounts=accounts,
-        suggestion_names=dict(accounts),
+        suggestion_names={a.account_number: a.advertiser for a in accounts},
         total_groups=total_groups,
         total_ads=total_ads,
         page=page,
@@ -172,7 +175,9 @@ def resolve_orphans():
         return back
 
     if action == "attach":
-        target = (request.form.get("account_number") or "").strip().upper()
+        # The box holds either a bare number or a picked list entry such as
+        # "000755 - St. Mary Parish (Seattle)"; the number is the first word.
+        target = ((request.form.get("account_number") or "").split() or [""])[0].upper()
         account = db.session.get(Account, target) if target else None
         if account is None:
             flash(f"Account {target or '(blank)'} does not exist. Pick an existing account number.", "error")

@@ -848,6 +848,17 @@ table.compact td {
   min-width: 12rem;
 }
 
+/* Orphan ads: the account search box is wide enough to show "number - name - contact - city". */
+.inline-form label.account-search {
+  flex: 1 1 26rem;
+  max-width: 40rem;
+}
+
+.inline-form label.account-search input {
+  flex: 1;
+  min-width: 0;
+}
+
 .add-entry {
   margin: 0.25rem 0 1rem;
 }

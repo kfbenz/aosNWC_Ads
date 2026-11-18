@@ -37,6 +37,7 @@ os.environ["AUTH_MODE"] = "dev"
 sys.path.insert(0, PROJECT)
 
 from flask import g  # noqa: E402
+from markupsafe import escape  # noqa: E402
 from sqlalchemy import Integer, select  # noqa: E402
 
 from config import Config  # noqa: E402
@@ -632,6 +633,25 @@ with dev_app.app_context():
     check("orphans: attach audited", db.session.scalar(select(db.func.count(AuditLog.id)).where(AuditLog.entity == "ad_placements", AuditLog.changes.contains('"account_number": [null, "000030"]'))) == n030)
 status, html, _ = get(client, "/admin/orphans")
 check("orphans: count drops after cleanup", f"{orphan_total - n030 - (n755 if has_000755 else 0):,} ads under" in html)
+# The "Attach to account" list lets the admin search accounts by name, not only by number.
+with dev_app.app_context():
+    pick = db.session.execute(
+        select(Account.account_number, Account.advertiser).where(Account.advertiser.is_not(None), Account.advertiser != "").limit(1)
+    ).one()
+    pick_legacy, pick_n = db.session.execute(
+        select(AdPlacement.legacy_account_number, db.func.count(AdPlacement.id))
+        .where(AdPlacement.account_number.is_(None), AdPlacement.legacy_account_number.is_not(None))
+        .group_by(AdPlacement.legacy_account_number).limit(1)
+    ).one()
+check("orphans: account search list holds names as well as numbers",
+      'list="dl-accounts"' in html and "Type a name, number, contact, or city" in html
+      and f'<option value="{escape(pick.account_number + " - " + pick.advertiser)}' in html)
+client.post("/admin/orphans/resolve", data={"legacy": pick_legacy, "action": "attach",
+                                            "account_number": f"{pick.account_number} - {pick.advertiser} - Seattle"})
+with dev_app.app_context():
+    moved = db.session.scalar(select(db.func.count(AdPlacement.id)).where(
+        AdPlacement.account_number == pick.account_number, AdPlacement.legacy_account_number == pick_legacy))
+check(f"orphans: attach from a picked list entry moves {pick_n} ads to {pick.account_number}", moved == pick_n)
 
 # ---- admin: lookup lists
 print("-- admin: lookups")
